@@ -151,6 +151,8 @@ public:
             // Else we've looped around!
             else if (first == next)
             {
+                cout << "first is : " << first << endl;
+                cout << "next is : " << next << endl;
                 CPPUNIT_ASSERT(false);
             }
 
