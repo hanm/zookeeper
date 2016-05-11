@@ -87,19 +87,19 @@ TEST_SOURCES = \
 	tests/MocksBase.cc \
 	tests/ZKMocks.cc \
 	tests/Util.cc \
-	tests/ThreadingUtil.cc \
-	tests/TestZookeeperInit.cc \
-	tests/TestZookeeperClose.cc \
+	#tests/ThreadingUtil.cc \
+	#tests/TestZookeeperInit.cc \
+	#tests/TestZookeeperClose.cc \
 	tests/TestReconfig.cc \
-	tests/TestReconfigServer.cc \
-    tests/TestClientRetry.cc \
-	tests/TestOperations.cc \
-	tests/TestMulti.cc \
-	tests/TestWatchers.cc \
-	tests/TestClient.cc \
-	tests/ZooKeeperQuorumServer.cc \
-	tests/ZooKeeperQuorumServer.h \
-	tests/TestReadOnlyClient.cc \
+	#tests/TestReconfigServer.cc \
+    #tests/TestClientRetry.cc \
+	#tests/TestOperations.cc \
+	#tests/TestMulti.cc \
+	#tests/TestWatchers.cc \
+	#tests/TestClient.cc \
+	#tests/ZooKeeperQuorumServer.cc \
+	#tests/ZooKeeperQuorumServer.h \
+	#tests/TestReadOnlyClient.cc \
 	$(NULL)
 
 if SOLARIS
