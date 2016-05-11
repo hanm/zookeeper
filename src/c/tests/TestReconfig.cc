@@ -151,6 +151,7 @@ public:
             // Else we've looped around!
             else if (first == next)
             {
+                cout << endl;
                 cout << "first is : " << first << endl;
                 cout << "next is : " << next << endl;
                 CPPUNIT_ASSERT(false);
@@ -183,6 +184,7 @@ public:
     {
         setServers(new_hosts);
         if (is_reconfig != isReconfig()) {
+          cout << endl;
           cout << "Bad value " << zh->reconfig << endl;
         }
         CPPUNIT_ASSERT_EQUAL(is_reconfig, isReconfig());
@@ -492,6 +494,10 @@ public:
 
             // Assert it's in the old list
             size_t found = oldStaying.find(next);
+            if (found == string::npos) {
+              cout << endl;
+              cout << "Bad, old list is :" << oldStaying << endl;
+            }
             CPPUNIT_ASSERT(found != string::npos);
 
             // Assert not in seen list then append
