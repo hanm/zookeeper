@@ -182,6 +182,9 @@ public:
     void setServersAndVerifyReconfig(const string new_hosts, bool is_reconfig)
     {
         setServers(new_hosts);
+        if (is_reconfig != isReconfig()) {
+          cout << "Bad value " << zh->reconfig << endl;
+        }
         CPPUNIT_ASSERT_EQUAL(is_reconfig, isReconfig());
     }
 
