@@ -92,11 +92,11 @@ TEST_SOURCES = \
 	tests/TestZookeeperClose.cc \
 	tests/TestReconfig.cc \
 	#tests/TestReconfigServer.cc \
-    #tests/TestClientRetry.cc \
+        #tests/TestClientRetry.cc \
 	#tests/TestOperations.cc \
 	#tests/TestMulti.cc \
 	#tests/TestWatchers.cc \
-	tests/TestClient.cc \
+	#tests/TestClient.cc \
 	tests/ZooKeeperQuorumServer.cc \
 	tests/ZooKeeperQuorumServer.h \
 	#tests/TestReadOnlyClient.cc \
@@ -131,7 +131,7 @@ endif
   zktest_mt_LDFLAGS = -static-libtool-libs $(SYMBOL_WRAPPERS_MT) $(SOLARIS_LIB_LDFLAGS)
 endif
 
-TESTS = $(check_PROGRAMS)
+TESTS = zktest-mt
 
 clean-local: clean-check
 	$(RM) $(DX_CLEANFILES)
