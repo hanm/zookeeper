@@ -52,7 +52,9 @@ public:
     {
         reSeed();
 
+        cout << "Connecting to hosts : " << hosts.c_str() << endl;
         zh = zookeeper_init(hosts.c_str(),0,1000,0,0,0);
+        cout << "Connection results: " << zh << endl;
         CPPUNIT_ASSERT(zh);
 
         reSeed();
@@ -423,6 +425,8 @@ public:
     void testMigrateOrNot()
     {
         const string initial_hosts = createHostList(4); // 2004..2001
+
+        cout << "testMigrateOrNot() : " << "initial_hosts are : " << initial_hosts << endl;
 
         Client &client = createClient(initial_hosts, "10.10.10.3");
 
