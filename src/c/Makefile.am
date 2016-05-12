@@ -92,13 +92,13 @@ TEST_SOURCES = \
 	tests/TestZookeeperClose.cc \
 	tests/TestReconfig.cc \
 	#tests/TestReconfigServer.cc \
-        #tests/TestClientRetry.cc \
+    #tests/TestClientRetry.cc \
 	#tests/TestOperations.cc \
 	#tests/TestMulti.cc \
 	#tests/TestWatchers.cc \
 	#tests/TestClient.cc \
-	tests/ZooKeeperQuorumServer.cc \
-	tests/ZooKeeperQuorumServer.h \
+	#tests/ZooKeeperQuorumServer.cc \
+	#tests/ZooKeeperQuorumServer.h \
 	#tests/TestReadOnlyClient.cc \
 	$(NULL)
 

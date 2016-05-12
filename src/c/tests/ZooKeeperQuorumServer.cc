@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <unistd.h>
 
 ZooKeeperQuorumServer::
@@ -29,6 +30,7 @@ ZooKeeperQuorumServer(uint32_t id, uint32_t numServers) :
     numServers_(numServers) {
     const char* root = getenv("ZKROOT");
     if (root == NULL) {
+        std::cout << "ZKROOT " << root << std::endl;
         assert(!"Environment variable 'ZKROOT' is not set");
     }
     root_ = root;
