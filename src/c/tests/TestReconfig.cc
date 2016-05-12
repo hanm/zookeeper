@@ -497,6 +497,7 @@ public:
             if (found == string::npos) {
               cout << endl;
               cout << "Bad, old list is :" << oldStaying << endl;
+              cout << "target value to be found is : " << next << endl;
             }
             CPPUNIT_ASSERT(found != string::npos);
 
