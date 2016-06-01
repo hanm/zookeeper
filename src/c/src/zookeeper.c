@@ -1177,6 +1177,7 @@ static zhandle_t *zookeeper_init_internal(const char *host, watcher_fn watcher,
     zh->active_node_watchers=create_zk_hashtable();
     zh->active_exist_watchers=create_zk_hashtable();
     zh->active_child_watchers=create_zk_hashtable();
+    zh->reconfigTest = 0;
 
     if (adaptor_init(zh) == -1) {
         goto abort;
@@ -2194,8 +2195,13 @@ int zookeeper_interest(zhandle_t *zh, socket_t *fd, int *interest,
          *
          * We always clear the delay setting. If we fail again, we'll set delay
          * again and on the next iteration we'll do the same.
+         *
+         * If we are in reconfig test mode (zh->reconfigTest == 1), then we always
+         * want to delay to avoid execute another code path where zoo_cycle_next_server
+         * will be called, which will interfere with client's test cases.
+         * See ZOOKEEPER-2152 for more details.
          */
-        if (zh->delay == 1) {
+        if (zh->delay == 1 || zh->reconfigTest == 1) {
             *tv = get_timeval(zh->recv_timeout/60);
             zh->delay = 0;
 

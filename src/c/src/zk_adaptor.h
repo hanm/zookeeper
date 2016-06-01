@@ -202,6 +202,8 @@ struct _zhandle {
     int reconfig;                       // Are we in the process of reconfiguring cluster's ensemble
     double pOld, pNew;                  // Probability for selecting between 'addrs_old' and 'addrs_new'
     int delay;
+    int reconfigTest;                   // A special flag that's only set and used in reconfig unit test.
+                                        // When set will delay client's attemp to connect to server forever.
 
     watcher_fn watcher;                 // the registered watcher
 

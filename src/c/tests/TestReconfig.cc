@@ -54,6 +54,9 @@ public:
 
         zh = zookeeper_init(hosts.c_str(),0,1000,0,0,0);
         CPPUNIT_ASSERT(zh);
+        // Set this flag to prevent ZK client calling zoo_cycle_next_server which
+        // would interfere with our test logic.
+        zh->reconfigTest = 1;
 
         reSeed();
 
