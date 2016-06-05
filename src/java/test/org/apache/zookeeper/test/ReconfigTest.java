@@ -151,6 +151,8 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
                     String str = new String(res);
                     LOG.info(str);
                     Assert.fail();
+                } else {
+                    LOG.info("ok");
                 }
                 Assert.assertEquals(data, new String(res));
                 break;
@@ -269,6 +271,9 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
 
         joiningServers.clear();
 */
+
+        // TODO: kill me.
+        testNormalOperation(zkArr[followerIndex], zkArr[leaderIndex]);
 
         // change leader's leading port - should renounce leadership
 
