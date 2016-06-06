@@ -128,34 +128,34 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
 
         return configStr;
     }
-    
-    public static void testNormalOperation(ZooKeeper writer, ZooKeeper reader)
+
+    public static void testNormalOperation(ZooKeeper writer, final ZooKeeper reader)
             throws KeeperException, InterruptedException {
         boolean testNodeExists = false;
-       
-       for (int j = 0; j < 30; j++) {
+        for (int j = 0; j < 30; j++) {
             try {
-               if (!testNodeExists) {
-                   try{ 
-                       writer.create("/test", "test".getBytes(),
-                           ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-                   } catch (KeeperException.NodeExistsException e) {                       
-                   }
-                   testNodeExists = true;
-               }
-                String data = "test" + j;
-                writer.setData("/test", data.getBytes(), -1);
-                reader.sync("/", null, null);
-                byte[] res = reader.getData("/test", null, new Stat());
-                if(!data.equals(new String(res))) {
-                    String str = new String(res);
-                    LOG.info(str);
-                    Assert.fail();
-                } else {
-                    LOG.info("ok");
+                if (!testNodeExists) {
+                    try{
+                        writer.create("/test", "test".getBytes(),
+                                ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                    } catch (KeeperException.NodeExistsException e) {
+                    }
+                    testNodeExists = true;
                 }
-                Assert.assertEquals(data, new String(res));
-                break;
+                final String data = "test" + j;
+                writer.setData("/test", data.getBytes(), -1);
+
+                reader.sync("/", new VoidCallback() {
+                    @Override
+                    public void processResult(int code, String arg1, Object arg2) {
+                        try {
+                            byte[] res = reader.getData("/test", null, new Stat());
+                            Assert.assertEquals(data, new String(res));
+                            //break;
+                        } catch (Exception exc) {
+                        }
+                    }
+                }, null);
             } catch (KeeperException.ConnectionLossException e) {
                 if (j < 29) {
                     Thread.sleep(1000);
@@ -165,11 +165,9 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
                     Assert.fail("client could not connect to reestablished quorum: giving up after 30+ seconds.");
                 }
             }
-
         }
+    }
 
-    }    
-    
     private int getLeaderId(QuorumUtil qu) {
         int leaderId = 1;
         while (qu.getPeer(leaderId).peer.leader == null)
