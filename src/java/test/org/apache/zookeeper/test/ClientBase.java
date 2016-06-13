@@ -242,6 +242,8 @@ public abstract class ClientBase extends ZKTestCase {
                 if (result.startsWith("Zookeeper version:") &&
                         !result.contains("READ-ONLY")) {
                     return true;
+                } else {
+                    LOG.info("kiki : {}", result);
                 }
             } catch (IOException e) {
                 // ignore as this is expected
