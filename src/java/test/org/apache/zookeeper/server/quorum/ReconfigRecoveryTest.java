@@ -476,6 +476,7 @@ public class ReconfigRecoveryTest extends QuorumPeerTestBase {
         // Run servers 0..2 for a while
         MainThread mt[] = new MainThread[SERVER_COUNT];
         ZooKeeper zk[] = new ZooKeeper[SERVER_COUNT];
+
         for (int i = 0; i <= 2; i++) {
             mt[i] = new MainThread(i, ports[i][2], currentQuorumCfg
                     , true, "100000000");
@@ -484,7 +485,7 @@ public class ReconfigRecoveryTest extends QuorumPeerTestBase {
                     ClientBase.CONNECTION_TIMEOUT, this);
         }
 
-        ReconfigTest.testNormalOperation(zk[0], zk[2]);
+        // ReconfigTest.testNormalOperation(zk[0], zk[2]);
 
         for (int i = 0; i <= 2; i++) {
             Assert.assertTrue("waiting for server " + i + " being up",
@@ -497,6 +498,10 @@ public class ReconfigRecoveryTest extends QuorumPeerTestBase {
             mt[i].shutdown();
             zk[i].close();
         }
+
+
+        System.out.println("first.");
+
 
         // generate new config string
         ArrayList<String> allServersNext = new ArrayList<String>();
@@ -525,6 +530,8 @@ public class ReconfigRecoveryTest extends QuorumPeerTestBase {
         zk[3] = new ZooKeeper("127.0.0.1:" + ports[3][2],
                 ClientBase.CONNECTION_TIMEOUT, this);
 
+        System.out.println("first verified. Verifying second.");
+
         for (int i = 2; i < SERVER_COUNT; i++) {
             Assert.assertTrue("waiting for server " + i + " being up",
                     ClientBase.waitForServerUp("127.0.0.1:" + ports[i][2],
@@ -532,8 +539,11 @@ public class ReconfigRecoveryTest extends QuorumPeerTestBase {
             ReconfigTest.testServerHasConfig(zk[i], allServersNext, null);
         }
 
-        ReconfigTest.testNormalOperation(zk[0], zk[2]);
-        ReconfigTest.testNormalOperation(zk[3], zk[1]);
+        System.out.println("second.");
+
+/*
+//        ReconfigTest.testNormalOperation(zk[0], zk[2]);
+//        ReconfigTest.testNormalOperation(zk[3], zk[1]);
         Assert.assertEquals(nextQuorumCfgSection + "version=200000000",
                 ReconfigTest.testServerHasConfig(zk[2], null, null));
         Assert.assertEquals(nextQuorumCfgSection + "version=200000000",
@@ -543,6 +553,7 @@ public class ReconfigRecoveryTest extends QuorumPeerTestBase {
             zk[i].close();
             mt[i].shutdown();
         }
+*/
     }
 
     /*
