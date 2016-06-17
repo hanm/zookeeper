@@ -357,7 +357,10 @@ public class QuorumCnxManager {
              */
             SendWorker sw = senderWorkerMap.get(sid);
             if (sw != null) {
+                LOG.info("receiveConnection : calling send worker finish.");
                 sw.finish();
+            } else {
+                LOG.info("receiveConnection : null send worker for serer " + sid + "!!!");
             }
 
             /*
@@ -758,7 +761,7 @@ public class QuorumCnxManager {
         }
                 
         synchronized boolean finish() {
-            LOG.debug("Calling finish for " + sid);
+            LOG.info("Calling finish for " + sid);
             
             if(!running){
                 /*
@@ -775,7 +778,7 @@ public class QuorumCnxManager {
                 recvWorker.finish();
             }
 
-            LOG.debug("Removing entry from senderWorkerMap sid=" + sid);
+            LOG.info("Removing entry from senderWorkerMap sid=" + sid);
 
             senderWorkerMap.remove(sid, this);
             threadCnt.decrementAndGet();
