@@ -654,11 +654,11 @@ public class FastLeaderElection implements Election {
         stop = true;
         proposedLeader = -1;
         proposedZxid = -1;
-        LOG.debug("Shutting down connection manager");
+        LOG.info("Shutting down connection manager");
         manager.halt();
-        LOG.debug("Shutting down messenger");
+        LOG.info("Shutting down messenger");
         messenger.halt();
-        LOG.debug("FLE is down");
+        LOG.info("FLE is down");
     }
 
     /**

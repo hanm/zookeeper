@@ -313,6 +313,7 @@ public class QuorumCnxManager {
         InetSocketAddress electionAddr = null;
 
         try {
+            LOG.info("receiveConnection : working.");
             DataInputStream din = new DataInputStream(sock.getInputStream());
 
             protocolVersion = din.readLong();
@@ -347,6 +348,8 @@ public class QuorumCnxManager {
         
         //If wins the challenge, then close the new connection.
         if (sid < self.getId()) {
+            LOG.info("receiveConnection : My id " + self.getId() + " is greater than " + sid + " so I win," +
+                    "closing the new connection and create a new one.");
             /*
              * This replica might still believe that the connection to sid is
              * up, so we have to shut down the workers before trying to open a
@@ -360,9 +363,9 @@ public class QuorumCnxManager {
             /*
              * Now we start a new connection
              */
-            LOG.debug("Create new connection to server: {}", sid);
+            LOG.info("receiveConnection : Create new connection to server: {}", sid);
             closeSocket(sock);
-
+            LOG.info("receiveConnetion : closed old client socket.");
             if (electionAddr != null) {
                 connectOne(sid, electionAddr);
             } else {
@@ -428,19 +431,21 @@ public class QuorumCnxManager {
      *  @return boolean success indication
      */
     synchronized private boolean connectOne(long sid, InetSocketAddress electionAddr){
+        LOG.info("receiveConnection -> connectOne");
         if (senderWorkerMap.get(sid) != null) {
-            LOG.debug("There is a connection already for server " + sid);
+            LOG.info("There is a connection already for server " + sid);
             return true;
         }
 
         Socket sock = null;
         try {
-             LOG.debug("Opening channel to server " + sid);
+             LOG.info("connectOne : Opening channel to server " + sid);
              sock = new Socket();
              setSockOpts(sock);
              sock.connect(electionAddr, cnxTO);
-             LOG.debug("Connected to server " + sid);
+             LOG.info("connectOne : Connected to server " + sid);
              initiateConnection(sock, sid);
+             LOG.info("connectOne : connection initiated to " + sid);
              return true;
          } catch (UnresolvedAddressException e) {
              // Sun doesn't include the address that causes this
@@ -468,26 +473,33 @@ public class QuorumCnxManager {
      */
     
     synchronized void connectOne(long sid){
+        LOG.info("connectOne(long sid)");
         if (senderWorkerMap.get(sid) != null) {
-             LOG.debug("There is a connection already for server " + sid);
+             LOG.info("connectOne : There is a connection already for server " + sid);
              return;
         }
         synchronized(self) {
+            LOG.info("connectOne - sync");
            boolean knownId = false;
             // Resolve hostname for the remote server before attempting to
             // connect in case the underlying ip address has changed.
             self.recreateSocketAddresses(sid);
+            LOG.info("connectOne - recreateSocketAddresses");
             if (self.getView().containsKey(sid)) {
                knownId = true;
-                if (connectOne(sid, self.getView().get(sid).electionAddr))
-                   return;
+                if (connectOne(sid, self.getView().get(sid).electionAddr)) {
+                    LOG.info("connectOne - return.");
+                    return;
+                }
             } 
             if (self.getLastSeenQuorumVerifier()!=null && self.getLastSeenQuorumVerifier().getAllMembers().containsKey(sid)
                    && (!knownId || (self.getLastSeenQuorumVerifier().getAllMembers().get(sid).electionAddr !=
                    self.getView().get(sid).electionAddr))) {
                knownId = true;
-                if (connectOne(sid, self.getLastSeenQuorumVerifier().getAllMembers().get(sid).electionAddr))
-                   return;
+                if (connectOne(sid, self.getLastSeenQuorumVerifier().getAllMembers().get(sid).electionAddr)) {
+                    LOG.info("connectOne - return 2.");
+                    return;
+                }
             } 
             if (!knownId) {
                 LOG.warn("Invalid server id: " + sid);
@@ -504,6 +516,7 @@ public class QuorumCnxManager {
     
     public void connectAll(){
         long sid;
+        LOG.warn("connectAll is called.");
         for(Enumeration<Long> en = queueSendMap.keys();
             en.hasMoreElements();){
             sid = en.nextElement();
@@ -531,12 +544,14 @@ public class QuorumCnxManager {
      */
     public void halt() {
         shutdown = true;
-        LOG.debug("Halting listener");
+        LOG.info("Halting listener");
         listener.halt();
         
         // Wait for the listener to terminate.
         try {
+            LOG.info("Wait for listener.join() to finish.....");
             listener.join();
+            LOG.info("Listner joined :)");
         } catch (InterruptedException ex) {
             LOG.warn("Got interrupted before joining the listener", ex);
         }
@@ -633,10 +648,12 @@ public class QuorumCnxManager {
                     setName(addr.toString());
                     ss.bind(addr);
                     while (!shutdown) {
+                        LOG.info("Listener thread run : ss.accept with shutdown " + shutdown);
                         client = ss.accept();
                         setSockOpts(client);
                         LOG.info("Received connection request "
                                 + client.getRemoteSocketAddress());
+                        LOG.info("Listenter shut down flag: " + shutdown);
                         receiveConnection(client);
                         numRetries = 0;
                     }
