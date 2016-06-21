@@ -662,8 +662,10 @@ public class QuorumCnxManager {
                                 + client.getRemoteSocketAddress());
                         LOG.info("Listenter shut down flag: " + shutdown);
                         receiveConnection(client);
+                        LOG.info("Listener thread: finish receiveConnection.");
                         numRetries = 0;
                     }
+                    LOG.info("Listener thread, bail out.");
                 } catch (IOException e) {
                     if (shutdown) {
                         break;
@@ -768,17 +770,23 @@ public class QuorumCnxManager {
             LOG.info("Calling finish for " + sid);
             
             if(!running){
+                LOG.info("SendWorker finish : not running, just return.");
                 /*
                  * Avoids running finish() twice. 
                  */
                 return running;
             }
-            
+
+            LOG.info("SendWorker finish : set running to false.");
             running = false;
             closeSocket(sock);
 
+            LOG.info("SendWorker finish : closed socket. Preparing interrupting current (send worker) thread.");
             this.interrupt();
+            LOG.info("SendWorker finish : thread interrupted.");
+
             if (recvWorker != null) {
+                LOG.info("SendWorker finish : preparing finishing receive worker.");
                 recvWorker.finish();
             }
 
@@ -941,7 +949,9 @@ public class QuorumCnxManager {
             } finally {
                 LOG.warn("Interrupting SendWorker");
                 sw.finish();
+                LOG.info("Interrupting SendWorker : Send worker finished.");
                 closeSocket(sock);
+                LOG.info("Interrupting SendWorker : Socket closed.");
             }
         }
     }
