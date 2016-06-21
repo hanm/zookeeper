@@ -370,9 +370,13 @@ public class QuorumCnxManager {
             closeSocket(sock);
             LOG.info("receiveConnetion : closed old client socket.");
             if (electionAddr != null) {
+                LOG.info("receiveConnetion : connectOne(sid, electionAddr)");
                 connectOne(sid, electionAddr);
+                LOG.info("kiki-1");
             } else {
+                LOG.info("receiveConnection: connectOne(sid)");
                 connectOne(sid);
+                LOG.info("kiki-2");
             }
 
         } else { // Otherwise start worker threads to receive data.
