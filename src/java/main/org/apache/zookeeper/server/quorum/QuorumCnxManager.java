@@ -557,7 +557,7 @@ public class QuorumCnxManager {
         // Wait for the listener to terminate.
         try {
             LOG.info("Wait for listener.join() to finish.....");
-            listener.join();
+            listener.join(30000);
             LOG.info("Listner joined :)");
         } catch (InterruptedException ex) {
             LOG.warn("Got interrupted before joining the listener", ex);
