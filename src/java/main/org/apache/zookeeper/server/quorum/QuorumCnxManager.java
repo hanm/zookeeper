@@ -77,6 +77,9 @@ public class QuorumCnxManager {
      */
 
     static final int MAX_CONNECTION_ATTEMPTS = 2;
+
+    // Timeout in milliseconds when joining thread.
+    static final int THREAD_JOIN_TIMEOUT = 30000;
     
     /*
      * Negative counter for observer server ids.
@@ -536,7 +539,7 @@ public class QuorumCnxManager {
         
         // Wait for the listener to terminate.
         try {
-            listener.join();
+            listener.join(THREAD_JOIN_TIMEOUT);
         } catch (InterruptedException ex) {
             LOG.warn("Got interrupted before joining the listener", ex);
         }
