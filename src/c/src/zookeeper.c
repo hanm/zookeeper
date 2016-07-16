@@ -1309,6 +1309,10 @@ void zoo_cycle_next_server(zhandle_t *zh)
         zh->reconfig = 0;
     }
 
+    // NOTE: If we're at the end of the list of addresses to connect to, then
+    // we want to delay the next connection attempt to avoid spinning.
+    // Then increment what host we'll connect to since we failed to connect to current
+    zh->delay = addrvec_atend(&zh->addrs);
     addrvec_next(&zh->addrs, &zh->addr_cur);
 
     unlock_reconfig(zh);
@@ -1704,11 +1708,7 @@ static void handle_error(zhandle_t *zh,int rc)
 
     LOG_DEBUG(LOGCALLBACK(zh), "Previous connection=[%s] delay=%d", zoo_get_current_server(zh), zh->delay);
 
-    // NOTE: If we're at the end of the list of addresses to connect to, then
-    // we want to delay the next connection attempt to avoid spinning.
-    // Then increment what host we'll connect to since we failed to connect to current
-    zh->delay = addrvec_atend(&zh->addrs);
-    addrvec_next(&zh->addrs, &zh->addr_cur);
+    zoo_cycle_next_server(zh);
 
     if (!is_unrecoverable(zh)) {
         zh->state = 0;
@@ -2202,8 +2202,6 @@ int zookeeper_interest(zhandle_t *zh, socket_t *fd, int *interest,
             LOG_WARN(LOGCALLBACK(zh), "Delaying connection after exhaustively trying all servers [%s]",
                      zh->hostname);
         } else {
-            // No need to delay -- grab the next server and attempt connection
-            zoo_cycle_next_server(zh);
             zh->fd = socket(zh->addr_cur.ss_family, SOCK_STREAM, 0);
             if (zh->fd < 0) {
               rc = handle_socket_error_msg(zh,
@@ -2305,9 +2303,22 @@ int zookeeper_interest(zhandle_t *zh, socket_t *fd, int *interest,
                     LOG_INFO(LOGCALLBACK(zh),
                              "r/w server found at %s",
                              format_endpoint_info(&addr));
+                    
+                    /* Try switch to read-write server by cleaning
+                     * the current handle state and picking next server
+                     * previously we peeked at. */
                     handle_error(zh, ZRWSERVERFOUND);
                 } else {
-                    addrvec_next(&zh->addrs, NULL);
+                    lock_reconfig(zh);
+		    if (!zh->reconfig) {
+                        /* Advance the candidate server list to peek if we
+                         * did not find a RW server. If we are in the middle
+                         * of a reconfig, just bail out and let reconfig logic
+                         * shuffle the server list, and retry again after
+                         * reconfig is finished. */
+			addrvec_next(&zh->addrs, NULL);
+		    }
+		    unlock_reconfig(zh);
                 }
             }
             send_to = min(send_to, zh->ping_rw_timeout - idle_ping_rw);

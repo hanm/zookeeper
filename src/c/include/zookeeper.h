@@ -554,9 +554,9 @@ ZOOAPI int zoo_set_servers(zhandle_t *zh, const char *hosts);
  *
  * This method allows a client to cycle through the list of servers in it's
  * connection pool to be used on the next connection attempt. This function does
- * not actually trigger a connection or state change in any way. Its purpose is
- * to allow testing changing servers on the fly and the probabilistic load
- * balancing algorithm.
+ * not actually trigger a connection but does change the state of zh handle by
+ * updating the address of next server to connect. Its purpose is to allow testing
+ * changing servers on the fly and the probabilistic load balancing algorithm.
  */
 ZOOAPI void zoo_cycle_next_server(zhandle_t *zh);
 
