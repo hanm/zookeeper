@@ -2308,6 +2308,7 @@ int zookeeper_interest(zhandle_t *zh, socket_t *fd, int *interest,
                      * the current handle state and picking next server
                      * previously we peeked at. */
                     handle_error(zh, ZRWSERVERFOUND);
+                    zoo_cycle_next_server(zh);
                 } else {
                     lock_reconfig(zh);
 		    if (!zh->reconfig) {
