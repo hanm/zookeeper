@@ -285,7 +285,8 @@ public class FastLeaderElection implements Election {
                             byte b[] = new byte[configLength];
 
                             response.buffer.get(b);
-                                                       
+
+                            Election election = null;
                             synchronized(self) {
                                 try {
                                     rqv = self.configFromString(new String(b));
@@ -300,9 +301,7 @@ public class FastLeaderElection implements Election {
                                             if (!rqv.equals(curQV)) {
                                                 LOG.info("restarting leader election");
                                                 self.shuttingDownLE = true;
-                                                self.getElectionAlg().shutdown();
-
-                                                break;
+                                                election = self.getElectionAlg();
                                             }
                                         } else {
                                             LOG.debug("Skip processReconfig(), state: {}", self.getServerState());
@@ -313,7 +312,12 @@ public class FastLeaderElection implements Election {
                                } catch (ConfigException e) {
                                    LOG.error("Something went wrong while processing config received from {}", response.sid);
                                }
-                            }                          
+                            }
+
+                            if (election != null) {
+                                election.shutdown();
+                                break;
+                            }
                         } else {
                             LOG.info("Backward compatibility mode (before reconfig), server id: {}", response.sid);
                         }
