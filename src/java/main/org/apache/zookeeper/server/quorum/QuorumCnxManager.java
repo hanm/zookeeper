@@ -473,7 +473,12 @@ public class QuorumCnxManager {
              return;
         }
 
-        if (shutdown) return;
+        if (shutdown) {
+            LOG.info("shutdown flag is set, bail out.");
+            return;
+        } else {
+            LOG.info("shutdown flag not set, proceed to acquire the quorum peer lock.");
+        }
 
         synchronized(self) {
            boolean knownId = false;
