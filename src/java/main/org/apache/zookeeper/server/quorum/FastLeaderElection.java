@@ -285,35 +285,56 @@ public class FastLeaderElection implements Election {
                             byte b[] = new byte[configLength];
 
                             response.buffer.get(b);
-                                                       
-                            synchronized(self) {
-                                try {
-                                    rqv = self.configFromString(new String(b));
-                                    QuorumVerifier curQV = self.getQuorumVerifier();
-                                    if (rqv.getVersion() > curQV.getVersion()) {
-                                        LOG.info("{} Received version: {} my version: {}", self.getId(),
-                                                Long.toHexString(rqv.getVersion()),
-                                                Long.toHexString(self.getQuorumVerifier().getVersion()));
+
+                            Election election = null;
+                            try {
+                                rqv = self.configFromString(new String(b));
+                                QuorumVerifier curQV = self.getQuorumVerifier();
+                                if (rqv.getVersion() > curQV.getVersion()) {
+                                    LOG.info("{} Received version: {} my version: {}", self.getId(),
+                                            Long.toHexString(rqv.getVersion()),
+                                            Long.toHexString(self.getQuorumVerifier().getVersion()));
+
+                                    // Synchronize on the current QuorumPeer (self) while doing state
+                                    // (reconfig) change. Be careful about the circular dependency when
+                                    // acquiring a lock on 'self', as it's possible that QuorumCnxManager
+                                    // may try to acquire the same lock on current QuorumPeer (self)
+                                    // while we are holding the lock here. To prevent deadlock,
+                                    // avoid executing code that has dependency on QuorumCnxManager
+                                    // while we are holding the lock.
+                                    // See ZOOKEEPER-2080 for detailed analysis on a deadlock case.
+                                    synchronized(self) {
                                         if (self.getPeerState() == ServerState.LOOKING) {
                                             LOG.debug("Invoking processReconfig(), state: {}", self.getServerState());
                                             self.processReconfig(rqv, null, null, false);
                                             if (!rqv.equals(curQV)) {
                                                 LOG.info("restarting leader election");
+                                                // Signaling quorum peer to restart leader election.
                                                 self.shuttingDownLE = true;
-                                                self.getElectionAlg().shutdown();
 
-                                                break;
+                                                // Get a hold of current leader election object of quorum peer,
+                                                // so we can clean it up later without holding the lock of quorum
+                                                // peer. If we shutdown current leader election here,
+                                                // we will potentially run into deadlock, depends on timing,
+                                                // because shutdown code depends on QuorumCnxManager.
+                                                election = self.getElectionAlg();
                                             }
                                         } else {
                                             LOG.debug("Skip processReconfig(), state: {}", self.getServerState());
                                         }
                                     }
-                                } catch (IOException e) {
-                                    LOG.error("Something went wrong while processing config received from {}", response.sid);
-                               } catch (ConfigException e) {
-                                   LOG.error("Something went wrong while processing config received from {}", response.sid);
-                               }
-                            }                          
+                                }
+                            } catch (IOException e) {
+                                LOG.error("Something went wrong while processing config received from {}", response.sid);
+                            } catch (ConfigException e) {
+                                LOG.error("Something went wrong while processing config received from {}", response.sid);
+                            }
+
+                            if (election != null) {
+                                // Clean up current leader election and bail out.
+                                election.shutdown();
+                                break;
+                            }
                         } else {
                             LOG.info("Backward compatibility mode (before reconfig), server id: {}", response.sid);
                         }
