@@ -329,6 +329,18 @@ BUGFIXES:
   ZOOKEEPER-2459: Update NOTICE file with Netty notice
   (fpj via phunt)
 
+  ZOOKEEPER-1898: ZooKeeper Java cli shell always returns "0" as exit code
+  (Abraham Fine via phunt)
+
+  ZOOKEEPER-2477: documentation should refer to Java cli shell and not
+  C cli shell (Abraham Fine via phunt)
+
+  ZOOKEEPER-1256: ClientPortBindTest is failing on Mac OS X
+  (Camille via phunt)
+
+  ZOOKEEPER-2498: Potential resource leak in C client when processing
+  unexpected / out of order response (Michael Han via rgs)
+
 IMPROVEMENTS:
   ZOOKEEPER-2024 Major throughput improvement with mixed workloads (Kfir Lev-Ari via shralex)
 
