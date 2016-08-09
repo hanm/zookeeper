@@ -334,8 +334,6 @@ public:
         sprintf(cmd, "%s startClean %s", ZKSERVER_CMD, server.c_str());
         CPPUNIT_ASSERT(system(cmd) == 0);
         CPPUNIT_ASSERT(ctx.waitForConnected(zk));
-        
-        zk->close();
     }
     
     /** this checks for a deadlock in calling zookeeper_close and calls from a default watcher that might get triggered just when zookeeper_close() is in progress **/
