@@ -314,12 +314,28 @@ public:
     /** ZOOKEEPER-1057 This checks that the client connects to the second server when the first is not reachable **/
     void testFirstServerDown() {
         watchctx_t ctx;
-
+        const string hosts = "127.0.0.1:22182,127.0.0.1:22181";
+        const string server = "127.0.0.1:22181";
+        
         zoo_deterministic_conn_order(true);
-
-        zhandle_t* zk = createClient("127.0.0.1:22182,127.0.0.1:22181", &ctx);
+        
+        /** This checks the bug revealed in ZOOKEEPER-2466 where a client could skip servers while trying reconnect.
+         ** Stop the server to force zk client execute the error handling code path where the bug was found.
+         **/
+        char cmd[1024];
+        sprintf(cmd, "%s stop %s", ZKSERVER_CMD, server.c_str());
+        CPPUNIT_ASSERT(system(cmd) == 0);
+        
+        zhandle_t* zk = createClient(hosts.c_str(), &ctx);
         CPPUNIT_ASSERT(zk != 0);
+        CPPUNIT_ASSERT(!ctx.waitForConnected(zk));
+        
+        memset(cmd, 0, sizeof(cmd));
+        sprintf(cmd, "%s startClean %s", ZKSERVER_CMD, server.c_str());
+        CPPUNIT_ASSERT(system(cmd) == 0);
         CPPUNIT_ASSERT(ctx.waitForConnected(zk));
+        
+        zk.close();
     }
     
     /** this checks for a deadlock in calling zookeeper_close and calls from a default watcher that might get triggered just when zookeeper_close() is in progress **/
