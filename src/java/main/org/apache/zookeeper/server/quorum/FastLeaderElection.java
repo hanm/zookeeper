@@ -289,21 +289,22 @@ public class FastLeaderElection implements Election {
                             Election election = null;
                             try {
                                 rqv = self.configFromString(new String(b));
-                                QuorumVerifier curQV = self.getQuorumVerifier();
-                                if (rqv.getVersion() > curQV.getVersion()) {
-                                    LOG.info("{} Received version: {} my version: {}", self.getId(),
-                                            Long.toHexString(rqv.getVersion()),
-                                            Long.toHexString(self.getQuorumVerifier().getVersion()));
 
-                                    // Synchronize on the current QuorumPeer (self) while doing state
-                                    // (reconfig) change. Be careful about the circular dependency when
-                                    // acquiring a lock on 'self', as it's possible that QuorumCnxManager
-                                    // may try to acquire the same lock on current QuorumPeer (self)
-                                    // while we are holding the lock here. To prevent deadlock,
-                                    // avoid executing code that has dependency on QuorumCnxManager
-                                    // while we are holding the lock.
-                                    // See ZOOKEEPER-2080 for detailed analysis on a deadlock case.
-                                    synchronized(self) {
+                                // Synchronize on the current QuorumPeer (self) while doing state
+                                // (reconfig) change. Be careful about the circular dependency when
+                                // acquiring a lock on 'self', as it's possible that QuorumCnxManager
+                                // may try to acquire the same lock on current QuorumPeer (self)
+                                // while we are holding the lock here. To prevent deadlock,
+                                // avoid executing code that has dependency on QuorumCnxManager
+                                // while we are holding the lock.
+                                // See ZOOKEEPER-2080 for detailed analysis on a deadlock case.
+                                synchronized (self) {
+                                    QuorumVerifier curQV = self.getQuorumVerifier();
+                                    if (rqv.getVersion() > curQV.getVersion()) {
+                                        LOG.info("{} Received version: {} my version: {}", self.getId(),
+                                                Long.toHexString(rqv.getVersion()),
+                                                Long.toHexString(self.getQuorumVerifier().getVersion()));
+
                                         if (self.getPeerState() == ServerState.LOOKING) {
                                             LOG.debug("Invoking processReconfig(), state: {}", self.getServerState());
                                             self.processReconfig(rqv, null, null, false);
