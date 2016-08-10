@@ -6,6 +6,7 @@ if SOLARIS
   SOLARIS_CPPFLAGS = -D_POSIX_PTHREAD_SEMANTICS
   SOLARIS_LIB_LDFLAGS = -lnsl -lsocket
 endif
+            
 AM_CPPFLAGS = -I${srcdir}/include -I${srcdir}/tests -I${srcdir}/generated $(SOLARIS_CPPFLAGS)
 AM_CFLAGS = -Wall -Werror -Wdeclaration-after-statement
 AM_CXXFLAGS = -Wall $(USEIPV6)
@@ -109,6 +110,10 @@ else
   SYMBOL_WRAPPERS=$(shell cat ${srcdir}/tests/wrappers.opt)
 endif
 
+if DARWIN
+SYMBOL_WRAPPERS=''
+endif
+                            
 check_PROGRAMS = zktest-st
 TESTS_ENVIRONMENT = ZKROOT=${srcdir}/../.. \
                     CLASSPATH=$$CLASSPATH:$$CLOVER_HOME/lib/clover.jar
