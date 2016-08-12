@@ -164,14 +164,4 @@ AM_CONDITIONAL([SOLARIS],[
     false
     ;;
   esac ])
-AC_CANONICAL_HOST
-AM_CONDITIONAL([DARWIN],[
-  case $host_os in
-  darwin* )
-    true
-    ;;
-  *)
-    false
-    ;;
-  esac ])
 AC_OUTPUT

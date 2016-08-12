@@ -110,10 +110,14 @@ else
   SYMBOL_WRAPPERS=$(shell cat ${srcdir}/tests/wrappers.opt)
 endif
 
-if DARWIN
-SYMBOL_WRAPPERS=''
-endif
-                            
+# If we are on OSX, don't pass wrap option. Note the white space
+# before 'ifeq' and'endif' are inserted intentionally to fool automake's 
+# regex-based checks.
+# TODO: use AM_CONDITIONAL in configure.ac to detect OSX.
+ ifeq ($(shell uname -s),Darwin)
+  SYMBOL_WRAPPERS=''
+ endif
+              
 check_PROGRAMS = zktest-st
 TESTS_ENVIRONMENT = ZKROOT=${srcdir}/../.. \
                     CLASSPATH=$$CLASSPATH:$$CLOVER_HOME/lib/clover.jar
