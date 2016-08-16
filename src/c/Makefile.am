@@ -104,8 +104,9 @@ TEST_SOURCES = \
 	$(NULL)
 
 if SOLARIS
-  SHELL_SYMBOL_WRAPPERS = cat ${srcdir}/tests/wrappers.opt
-  SYMBOL_WRAPPERS=$(SHELL_SYMBOL_WRAPPERS:sh)
+  #SHELL_SYMBOL_WRAPPERS = cat ${srcdir}/tests/wrappers.opt
+  #SYMBOL_WRAPPERS=$(SHELL_SYMBOL_WRAPPERS:sh)
+  SYMBOL_WRAPPERS=$(shell cat ${srcdir}/tests/wrappers.opt)
 else
   SYMBOL_WRAPPERS=$(shell cat ${srcdir}/tests/wrappers.opt)
 endif
