@@ -102,14 +102,6 @@ TEST_SOURCES = \
 	tests/TestReadOnlyClient.cc \
 	$(NULL)
 
-if SOLARIS
-  SHELL_SYMBOL_WRAPPERS = cat ${srcdir}/tests/wrappers.opt
-  SYMBOL_WRAPPERS=$(SHELL_SYMBOL_WRAPPERS:sh)
-  #SYMBOL_WRAPPERS=$(shell cat ${srcdir}/tests/wrappers.opt)
-else
-  SYMBOL_WRAPPERS=$(shell cat ${srcdir}/tests/wrappers.opt)
-endif
-
 check_PROGRAMS = zktest-st
 TESTS_ENVIRONMENT = ZKROOT=${srcdir}/../.. \
                     CLASSPATH=$$CLASSPATH:$$CLOVER_HOME/lib/clover.jar
