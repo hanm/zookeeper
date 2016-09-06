@@ -153,6 +153,21 @@ public class ContainerManager {
                 candidates.add(containerPath);
             }
         }
+        for (String ttlPath : zkDb.getDataTree().getTtls()) {
+            DataNode node = zkDb.getDataTree().getNode(ttlPath);
+            if ((node != null) && ((node.getChildren() == null) || node.getChildren().size() == 0)) {
+                long elapsed = getElapsed(node);
+                long ttl = EphemeralType.getTtl(node.stat.getEphemeralOwner());
+                if ((ttl != 0) && (elapsed > ttl)) {
+                    candidates.add(ttlPath);
+                }
+            }
+        }
         return candidates;
+    }
+
+    // VisibleForTesting
+    protected long getElapsed(DataNode node) {
+        return Time.currentWallTime() - node.stat.getMtime();
     }
 }

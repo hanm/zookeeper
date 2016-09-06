@@ -27,6 +27,7 @@ import org.apache.zookeeper.server.DataTree;
 import org.apache.zookeeper.server.ZooTrace;
 import org.apache.zookeeper.txn.CreateContainerTxn;
 import org.apache.zookeeper.txn.CreateSessionTxn;
+import org.apache.zookeeper.txn.CreateTtlTxn;
 import org.apache.zookeeper.txn.CreateTxn;
 import org.apache.zookeeper.txn.CreateTxnV0;
 import org.apache.zookeeper.txn.DeleteTxn;
@@ -67,6 +68,9 @@ public class SerializeUtils {
         case OpCode.create:
         case OpCode.create2:
             txn = new CreateTxn();
+            break;
+        case OpCode.createTtl:
+            txn = new CreateTtlTxn();
             break;
         case OpCode.createContainer:
             txn = new CreateContainerTxn();
