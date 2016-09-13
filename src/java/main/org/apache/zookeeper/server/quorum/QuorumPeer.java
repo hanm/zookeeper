@@ -988,7 +988,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
         return null;
     }
 
-    boolean shuttingDownLE = false;
+    volatile boolean shuttingDownLE = false;
     
     @Override
     public void run() {
