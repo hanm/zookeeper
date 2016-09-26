@@ -15,6 +15,7 @@
  * the License.
  */
 #include <algorithm>
+#include <sstream>
 #include <cppunit/extensions/HelperMacros.h>
 #include <unistd.h>
 #include "zookeeper.h"
@@ -70,7 +71,14 @@ TestReconfigServer::
 
 void TestReconfigServer::
 setUp() {
-    cluster_ = ZooKeeperQuorumServer::getCluster(NUM_SERVERS);
+    std::stringstream ss;
+    // Pass these additional configuration option when starting zk server,
+    // such that reconfig feature is enabled and we skip ACL check to simplify
+    // testing set up (the test coverage for ACL with reconfig is done in Java UT.).
+    // Check ZOOKEEPER-2014 for more details.
+    ss << "reconfigEnabled=true\n";
+    ss << "skipACL=yes\n";
+    cluster_ = ZooKeeperQuorumServer::getCluster(NUM_SERVERS, ss.str());
 }
 
 void TestReconfigServer::

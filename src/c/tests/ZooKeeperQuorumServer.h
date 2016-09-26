@@ -24,7 +24,8 @@
 class ZooKeeperQuorumServer {
   public:
     ~ZooKeeperQuorumServer();
-    static std::vector<ZooKeeperQuorumServer*> getCluster(uint32_t numServers);
+    static std::vector<ZooKeeperQuorumServer*> getCluster(uint32_t numServers,
+                                                          std::string config = "" /* Optional configs */);
     std::string getHostPort();
     uint32_t getClientPort();
     void start();
@@ -35,10 +36,10 @@ class ZooKeeperQuorumServer {
 
   private:
     ZooKeeperQuorumServer();
-    ZooKeeperQuorumServer(uint32_t id, uint32_t numServers);
+    ZooKeeperQuorumServer(uint32_t id, uint32_t numServers, std::string config = "");
     ZooKeeperQuorumServer(const ZooKeeperQuorumServer& that);
     const ZooKeeperQuorumServer& operator=(const ZooKeeperQuorumServer& that);
-    void createConfigFile();
+    void createConfigFile(std::string config = "");
     std::string getConfigFileName();
     void createDataDirectory();
     std::string getDataDirectory();

@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 ZooKeeperQuorumServer::
-ZooKeeperQuorumServer(uint32_t id, uint32_t numServers) :
+ZooKeeperQuorumServer(uint32_t id, uint32_t numServers, std::string config) :
     id_(id),
     numServers_(numServers) {
     const char* root = getenv("ZKROOT");
@@ -32,7 +32,7 @@ ZooKeeperQuorumServer(uint32_t id, uint32_t numServers) :
         assert(!"Environment variable 'ZKROOT' is not set");
     }
     root_ = root;
-    createConfigFile();
+    createConfigFile(config);
     createDataDirectory();
     start();
 }
@@ -102,7 +102,7 @@ isFollower() {
 }
 
 void ZooKeeperQuorumServer::
-createConfigFile() {
+createConfigFile(std::string config) {
     std::string command = "mkdir -p " + root_ + "/build/test/test-cppunit/conf";
     assert(system(command.c_str()) == 0);
     std::ofstream confFile;
@@ -117,6 +117,10 @@ createConfigFile() {
     confFile << "dataDir=" << getDataDirectory() << "\n";
     for (int i = 0; i < numServers_; i++) {
         confFile << getServerString(i) << "\n";
+    }
+    // Append additional config, if any.
+    if (!config.empty()) {
+      confFile << config << std::endl;
     }
     confFile.close();
 }
@@ -165,10 +169,10 @@ getDataDirectory() {
 }
 
 std::vector<ZooKeeperQuorumServer*> ZooKeeperQuorumServer::
-getCluster(uint32_t numServers) {
+getCluster(uint32_t numServers, std::string config) {
     std::vector<ZooKeeperQuorumServer*> cluster;
     for (int i = 0; i < numServers; i++) {
-        cluster.push_back(new ZooKeeperQuorumServer(i, numServers));
+        cluster.push_back(new ZooKeeperQuorumServer(i, numServers, config));
     }
 
     // Wait until all the servers start, and fail if they don't start within 10

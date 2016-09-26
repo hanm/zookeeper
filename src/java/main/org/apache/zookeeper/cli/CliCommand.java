@@ -20,6 +20,7 @@ package org.apache.zookeeper.cli;
 import java.io.PrintStream;
 import java.util.Map;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.ZooKeeperAdmin;
 
 /**
  * base class for all CLI commands
@@ -27,6 +28,7 @@ import org.apache.zookeeper.ZooKeeper;
 abstract public class CliCommand {
 
     protected ZooKeeper zk;
+    protected ZooKeeperAdmin zkAdmin;
     protected PrintStream out;
     protected PrintStream err;
     private String cmdStr;
@@ -62,12 +64,18 @@ abstract public class CliCommand {
     }
 
     /**
-     * set the zookeper instance
-     * @param zk the zookeper instance
+     * Set the ZooKeeper instance.
+     * @param zk the ZooKeeper instance.
      */
     public void setZk(ZooKeeper zk) {
         this.zk = zk;
     }
+
+    /**
+     * Set the ZooKeeperAdmin instance.
+     * @param zkAdmin The ZooKeeper admin instance.
+     */
+    public void setZKAdmin(ZooKeeperAdmin zkAdmin) { this.zkAdmin = zkAdmin; }
 
     /**
      * get the string used to call this command

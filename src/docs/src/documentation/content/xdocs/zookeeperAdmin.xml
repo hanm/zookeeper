@@ -931,6 +931,25 @@ server.3=zoo3:2888:3888</programlisting>
               feature. Default is "true"</para>
             </listitem>
           </varlistentry>
+
+          <varlistentry>
+            <term>reconfigEnabled</term>
+
+            <listitem>
+              <para>(No Java system property)</para>
+
+              <para><emphasis role="bold">New in 3.5.3:</emphasis>
+                This controls the enabling or disabling of
+                <ulink url="zookeeperReconfig.html">
+                  Dynamic Reconfiguration</ulink> feature.
+                It can be set by adding
+                "reconfigEnabled=false" or "reconfigEnabled=true"
+                to a server's config file, or using QuorumPeerConfig's
+                setReconfigEnabled method. The default value is false.
+              </para>
+            </listitem>
+          </varlistentry>
+
         </variablelist>
       </section>
 

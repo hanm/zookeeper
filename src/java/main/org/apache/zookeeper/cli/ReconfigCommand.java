@@ -18,8 +18,6 @@
 package org.apache.zookeeper.cli;
 
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.cli.*;
@@ -146,7 +144,7 @@ public class ReconfigCommand extends CliCommand {
     public boolean exec() throws CliException {
         try {
             Stat stat = new Stat();
-            byte[] curConfig = zk.reconfig(joining,
+            byte[] curConfig = zkAdmin.reconfig(joining,
                     leaving, members, version, stat);
             out.println("Committed new configuration:\n" + new String(curConfig));
             

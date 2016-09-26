@@ -84,6 +84,7 @@ public class ZooKeeperMain {
     protected int exitCode = 0;
 
     protected ZooKeeper zk;
+    protected ZooKeeperAdmin zkAdmin;
     protected String host = "";
 
     public boolean getPrintWatches( ) {
@@ -275,6 +276,11 @@ public class ZooKeeperMain {
         if (zk != null && zk.getState().isAlive()) {
             zk.close();
         }
+
+        if (zkAdmin != null && zk.getState().isAlive()) {
+            zkAdmin.close();
+        }
+
         host = newHost;
         boolean readOnly = cl.getOption("readonly") != null;
         if (cl.getOption("secure") != null) {
@@ -284,6 +290,10 @@ public class ZooKeeperMain {
         zk = new ZooKeeper(host,
                  Integer.parseInt(cl.getOption("timeout")),
                  new MyWatcher(), readOnly);
+
+        zkAdmin = new ZooKeeperAdmin(host,
+                Integer.parseInt(cl.getOption("timeout")),
+                new MyWatcher());
     }
     
     public static void main(String args[]) throws CliException, IOException, InterruptedException
@@ -296,8 +306,6 @@ public class ZooKeeperMain {
         cl.parseOptions(args);
         System.out.println("Connecting to " + cl.getOption("server"));
         connectToZK(cl.getOption("server"));
-        //zk = new ZooKeeper(cl.getOption("server"),
-//                Integer.parseInt(cl.getOption("timeout")), new MyWatcher());
     }
 
     public ZooKeeperMain(ZooKeeper zk) {
@@ -654,6 +662,7 @@ public class ZooKeeperMain {
         CliCommand cliCmd = commandMapCli.get(cmd);
         if(cliCmd != null) {
             cliCmd.setZk(zk);
+            cliCmd.setZKAdmin(zkAdmin);
             watch = cliCmd.parse(args).exec();
         } else if (!commandMap.containsKey(cmd)) {
              usage();
