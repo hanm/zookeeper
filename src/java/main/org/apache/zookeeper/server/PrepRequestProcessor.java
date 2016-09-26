@@ -467,7 +467,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 addChangeRecord(nodeRecord);
                 break;
             case OpCode.reconfig:
-                if (!QuorumPeerConfig.getReconfigEnabled()) {
+                if (!QuorumPeerConfig.isReconfigEnabled()) {
                     String msg = "Reconfig operation requested but reconfig feature is disabled.";
                     LOG.warn(msg);
                     throw new KeeperException.ReconfigDisabledException(msg);

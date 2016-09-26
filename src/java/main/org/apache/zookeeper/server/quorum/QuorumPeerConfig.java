@@ -743,7 +743,7 @@ public class QuorumPeerConfig {
         standaloneEnabled = enabled;
     }
 
-    public static boolean getReconfigEnabled() { return reconfigEnabled; }
+    public static boolean isReconfigEnabled() { return reconfigEnabled; }
 
     public static void setReconfigEnabled(boolean enabled) {
         reconfigEnabled = enabled;
