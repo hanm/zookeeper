@@ -126,9 +126,9 @@ public class ZooKeeperAdmin extends ZooKeeper {
     public byte[] reconfig(String joiningServers, String leavingServers,
                            String newMembers, long fromConfig, Stat stat) throws KeeperException, InterruptedException {
         RequestHeader h = new RequestHeader();
-        h.setType(ZooDefs.OpCode.reconfig);       
-        ReconfigRequest request = new ReconfigRequest(joiningServers, leavingServers, newMembers, fromConfig);        
-        GetDataResponse response = new GetDataResponse();       
+        h.setType(ZooDefs.OpCode.reconfig);
+        ReconfigRequest request = new ReconfigRequest(joiningServers, leavingServers, newMembers, fromConfig);
+        GetDataResponse response = new GetDataResponse();
         ReplyHeader r = cnxn.submitRequest(h, request, response, null);
         if (r.getErr() != 0) {
             throw KeeperException.create(KeeperException.Code.get(r.getErr()), "");
@@ -148,14 +148,14 @@ public class ZooKeeperAdmin extends ZooKeeper {
     public byte[] reconfig(List<String> joiningServers, List<String> leavingServers,
                            List<String> newMembers, long fromConfig,
                            Stat stat) throws KeeperException, InterruptedException {
-        return reconfig(StringUtils.joinStrings(joiningServers, ","), 
-        		StringUtils.joinStrings(leavingServers, ","), 
-        		StringUtils.joinStrings(newMembers, ","), 
-        		fromConfig, stat);
+        return reconfig(StringUtils.joinStrings(joiningServers, ","),
+                        StringUtils.joinStrings(leavingServers, ","),
+                        StringUtils.joinStrings(newMembers, ","),
+                        fromConfig, stat);
     }
 
     /**
-     * The Asynchronous version of reconfig. 
+     * The Asynchronous version of reconfig.
      *
      * @see #reconfig
      *      
@@ -163,13 +163,13 @@ public class ZooKeeperAdmin extends ZooKeeper {
     public void reconfig(String joiningServers, String leavingServers,
         String newMembers, long fromConfig, DataCallback cb, Object ctx) {
         RequestHeader h = new RequestHeader();
-        h.setType(ZooDefs.OpCode.reconfig);       
+        h.setType(ZooDefs.OpCode.reconfig);
         ReconfigRequest request = new ReconfigRequest(joiningServers, leavingServers, newMembers, fromConfig);
         GetDataResponse response = new GetDataResponse();
         cnxn.queuePacket(h, new ReplyHeader(), request, response, cb,
                ZooDefs.CONFIG_NODE, ZooDefs.CONFIG_NODE, ctx, null);
     }
- 
+
     /**
      * Convenience wrapper around asynchronous reconfig that takes Lists of strings instead of comma-separated servers.
      *
@@ -179,19 +179,19 @@ public class ZooKeeperAdmin extends ZooKeeper {
     public void reconfig(List<String> joiningServers,
         List<String> leavingServers, List<String> newMembers, long fromConfig,
         DataCallback cb, Object ctx) {
-        reconfig(StringUtils.joinStrings(joiningServers, ","), 
-        		StringUtils.joinStrings(leavingServers, ","), 
-        		StringUtils.joinStrings(newMembers, ","), 
-        		fromConfig, cb, ctx);
+        reconfig(StringUtils.joinStrings(joiningServers, ","),
+                 StringUtils.joinStrings(leavingServers, ","),
+                 StringUtils.joinStrings(newMembers, ","),
+                 fromConfig, cb, ctx);
     }
 
     /**
      * String representation of this ZooKeeperAdmin client. Suitable for things
      * like logging.
-     * 
+     *
      * Do NOT count on the format of this string, it may change without
      * warning.
-     * 
+     *
      * @since 3.5.3
      */
     @Override
