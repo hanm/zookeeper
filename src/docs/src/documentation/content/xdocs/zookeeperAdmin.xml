@@ -941,9 +941,16 @@ server.3=zoo3:2888:3888</programlisting>
               <para><emphasis role="bold">New in 3.5.3:</emphasis>
                 This controls the enabling or disabling of
                 <ulink url="zookeeperReconfig.html">
-                  Dynamic Reconfiguration</ulink> feature.
-                It can be set by adding
-                "reconfigEnabled=false" or "reconfigEnabled=true"
+                  Dynamic Reconfiguration</ulink> feature. When the feature
+                is enabled, users can perform reconfigure operations through
+                ZooKeeper client API or through ZooKeeper command line tools
+                if users are authenticated and authorized to perform such operations.
+                When the feature is disabled, any user including super user can not perform
+                any reconfigure related operations, and any attempts to use reconfig
+                API or reconfig command will return error.
+                <emphasis role="bold">"reconfigEnabled"</emphasis> option can be set as
+                <emphasis role="bold">"reconfigEnabled=false"</emphasis> or
+                <emphasis role="bold">"reconfigEnabled=true"</emphasis>
                 to a server's config file, or using QuorumPeerConfig's
                 setReconfigEnabled method. The default value is false.
               </para>
