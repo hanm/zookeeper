@@ -16,11 +16,16 @@
  * limitations under the License.
  */
 
-package org.apache.zookeeper;
+package org.apache.zookeeper.admin;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.Environment;
 import org.apache.zookeeper.AsyncCallback.DataCallback;
 import org.apache.zookeeper.client.ZKClientConfig;
 import org.apache.zookeeper.common.StringUtils;

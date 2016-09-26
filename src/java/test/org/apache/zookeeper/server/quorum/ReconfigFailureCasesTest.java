@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.NewConfigNoQuorum;
 import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.ZooKeeperAdmin;
+import org.apache.zookeeper.admin.ZooKeeperAdmin;
 import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.test.ClientBase;
 import org.apache.zookeeper.test.QuorumUtil;

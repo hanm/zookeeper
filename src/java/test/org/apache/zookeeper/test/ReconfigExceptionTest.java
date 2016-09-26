@@ -24,7 +24,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.zookeeper.*;
+import org.apache.zookeeper.ZKTestCase;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.PortAssignment;
+import org.apache.zookeeper.admin.ZooKeeperAdmin;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.data.Stat;
@@ -47,6 +51,17 @@ public class ReconfigExceptionTest extends ZKTestCase {
         System.setProperty("zookeeper.DigestAuthenticationProvider.superDigest",
                 "super:D/InIHSb7yEEbrWz8b9l71RjZJU="/* password is 'test'*/);
         QuorumPeerConfig.setReconfigEnabled(false);
+
+        // Get a three server quorum.
+        qu = new QuorumUtil(1);
+        qu.disableJMXTest = true;
+
+        try {
+            qu.startAll();
+        } catch (IOException e) {
+            Assert.fail("Fail to start quorum servers.");
+        }
+
         resetZKAdmin();
     }
 
@@ -157,20 +172,9 @@ public class ReconfigExceptionTest extends ZKTestCase {
         }
     }
 
-    // Reset the state of zkAdmin handle.
+    // Utility method that recreates a new ZooKeeperAdmin handle, and wait for the handle to connect to
+    // quorum servers.
     private void resetZKAdmin() throws InterruptedException {
-        if (qu == null) {
-            // Get a three server quorum.
-            qu = new QuorumUtil(1);
-            qu.disableJMXTest = true;
-
-            try {
-                qu.startAll();
-            } catch (IOException e) {
-                Assert.fail("Fail to start quorum servers.");
-            }
-        }
-
         String cnxString;
         ClientBase.CountdownWatcher watcher = new ClientBase.CountdownWatcher();
         try {
