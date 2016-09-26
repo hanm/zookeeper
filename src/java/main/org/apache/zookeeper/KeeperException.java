@@ -314,7 +314,7 @@ public abstract class KeeperException extends Exception {
          * @deprecated deprecated in 3.1.0, use {@link Code#RECONFIGDISABLED} instead
          */
         @Deprecated
-        public static final int ReconfigDisabled = -122;
+        public static final int ReconfigDisabled = -123;
     }
 
     /** Codes which represent the various KeeperException
