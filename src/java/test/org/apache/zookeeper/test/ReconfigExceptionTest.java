@@ -85,7 +85,7 @@ public class ReconfigExceptionTest extends ZKTestCase {
             reconfigPort();
             Assert.fail("Reconfig should be disabled by default.");
         } catch (KeeperException e) {
-            Assert.assertTrue(e.getCode() == KeeperException.Code.BadArguments);
+            Assert.assertTrue(e.getCode() == KeeperException.Code.ReconfigDisabled);
         }
     }
 

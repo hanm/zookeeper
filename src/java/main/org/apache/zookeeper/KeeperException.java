@@ -139,6 +139,8 @@ public abstract class KeeperException extends Exception {
                 return new EphemeralOnLocalSessionException();
             case NOWATCHER:
                 return new NoWatcherException();
+            case RECONFIGDISABLED:
+                return new ReconfigDisabledException();
             case OK:
             default:
                 throw new IllegalArgumentException("Invalid exception code");
@@ -308,6 +310,11 @@ public abstract class KeeperException extends Exception {
         @Deprecated
         public static final int EphemeralOnLocalSession = -120;
 
+        /**
+         * @deprecated deprecated in 3.1.0, use {@link Code#RECONFIGDISABLED} instead
+         */
+        @Deprecated
+        public static final int ReconfigDisabled = -122;
     }
 
     /** Codes which represent the various KeeperException
@@ -384,7 +391,9 @@ public abstract class KeeperException extends Exception {
         /** Attempt to create ephemeral node on a local session */
         EPHEMERALONLOCALSESSION (EphemeralOnLocalSession),
         /** Attempts to remove a non-existing watcher */
-        NOWATCHER (-121);
+        NOWATCHER (-121),
+        /** Attempts to perform a reconfiguration operation when reconfiguration feature is disabled. */
+        RECONFIGDISABLED(ReconfigDisabled);
 
         private static final Map<Integer,Code> lookup
             = new HashMap<Integer,Code>();
@@ -469,6 +478,8 @@ public abstract class KeeperException extends Exception {
                 return "Ephemeral node on local session";
             case NOWATCHER:
                 return "No such watcher";
+            case RECONFIGDISABLED:
+                return "Reconfig is disabled";
             default:
                 return "Unknown error " + code;
         }
@@ -793,6 +804,16 @@ public abstract class KeeperException extends Exception {
 
         public NoWatcherException(String path) {
             super(Code.NOWATCHER, path);
+        }
+    }
+
+    /**
+     * @see Code#RECONFIGDISABLED
+     */
+    public static class ReconfigDisabledException extends KeeperException {
+        public ReconfigDisabledException() { super(Code.RECONFIGDISABLED); }
+        public ReconfigDisabledException(String path) {
+            super(Code.RECONFIGDISABLED, path);
         }
     }
 }

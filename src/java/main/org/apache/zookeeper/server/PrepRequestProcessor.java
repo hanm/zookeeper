@@ -470,7 +470,11 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 if (!QuorumPeerConfig.getReconfigEnabled()) {
                     String msg = "Reconfig operation requested but reconfig feature is disabled.";
                     LOG.warn(msg);
-                    throw new KeeperException.BadArgumentsException(msg);
+                    throw new KeeperException.ReconfigDisabledException(msg);
+                }
+
+                if (skipACL) {
+                    LOG.warn("skipACL is set, reconfig operation will skip ACL checks!");
                 }
 
                 zks.sessionTracker.checkSession(request.sessionId, request.getOwner());
