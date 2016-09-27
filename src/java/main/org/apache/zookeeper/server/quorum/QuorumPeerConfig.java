@@ -280,7 +280,7 @@ public class QuorumPeerConfig {
                 } else if (value.toLowerCase().equals("false")) {
                     setStandaloneEnabled(false);
                 } else {
-                    throw new ConfigException("Invalid option for standalone mode. Choose 'true' or 'false.'");
+                    throw new ConfigException("Invalid option " + value + " for standalone mode. Choose 'true' or 'false.'");
                 }
             } else if (key.equals("reconfigEnabled")) {
                 if (value.toLowerCase().equals("true")) {
@@ -288,7 +288,7 @@ public class QuorumPeerConfig {
                 } else if (value.toLowerCase().equals("false")) {
                     setReconfigEnabled(false);
                 } else {
-                    throw new ConfigException("Invalid option for reconfigEnabled flag. Choose 'true' or 'false.'");
+                    throw new ConfigException("Invalid option " + value + " for reconfigEnabled flag. Choose 'true' or 'false.'");
                 }
             } else if ((key.startsWith("server.") || key.startsWith("group") || key.startsWith("weight")) && zkProp.containsKey("dynamicConfigFile")) {
                 throw new ConfigException("parameter: " + key + " must be in a separate dynamic config file");

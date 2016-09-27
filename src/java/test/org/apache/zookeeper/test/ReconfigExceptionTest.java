@@ -79,17 +79,17 @@ public class ReconfigExceptionTest extends ZKTestCase {
         }
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void testReconfigDisabledByDefault() throws InterruptedException {
         try {
             reconfigPort();
             Assert.fail("Reconfig should be disabled by default.");
         } catch (KeeperException e) {
-            Assert.assertTrue(e.getCode() == KeeperException.Code.ReconfigDisabled);
+            Assert.assertTrue(e.code() == KeeperException.Code.RECONFIGDISABLED);
         }
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void testReconfigFailWithoutAuth() throws InterruptedException {
         // Now enable reconfig feature by turning on the switch.
         QuorumPeerConfig.setReconfigEnabled(true);
@@ -103,7 +103,7 @@ public class ReconfigExceptionTest extends ZKTestCase {
         }
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void testReconfigEnabledWithSuperUser() throws InterruptedException {
         QuorumPeerConfig.setReconfigEnabled(true);
 
@@ -115,7 +115,7 @@ public class ReconfigExceptionTest extends ZKTestCase {
         }
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void testReconfigFailWithAuthWithNoACL() throws InterruptedException {
         resetZKAdmin();
         QuorumPeerConfig.setReconfigEnabled(true);
@@ -130,7 +130,7 @@ public class ReconfigExceptionTest extends ZKTestCase {
         }
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void testReconfigEnabledWithAuthAndWrongACL() throws InterruptedException {
         resetZKAdmin();
         QuorumPeerConfig.setReconfigEnabled(true);
@@ -152,7 +152,7 @@ public class ReconfigExceptionTest extends ZKTestCase {
         }
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void testReconfigEnabledWithAuthAndACL() throws InterruptedException {
         resetZKAdmin();
         QuorumPeerConfig.setReconfigEnabled(true);

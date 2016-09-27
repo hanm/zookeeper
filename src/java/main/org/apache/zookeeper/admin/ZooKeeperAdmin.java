@@ -25,7 +25,6 @@ import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.Environment;
 import org.apache.zookeeper.AsyncCallback.DataCallback;
 import org.apache.zookeeper.client.ZKClientConfig;
 import org.apache.zookeeper.common.StringUtils;
@@ -39,12 +38,16 @@ import org.apache.zookeeper.server.DataTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This is the main class for ZooKeeperAdmin client library.
+ * This library is used to perform cluster administration tasks,
+ * such as reconfigure cluster membership. The ZooKeeperAdmin class
+ * inherits ZooKeeper and has similar usage pattern as ZooKeeper class.
+ * Please check {@link ZooKeeper} class document for more details.
+ *
+ */
 public class ZooKeeperAdmin extends ZooKeeper {
-    private static final Logger LOG;
-    static {
-        LOG = LoggerFactory.getLogger(ZooKeeperAdmin.class);
-        Environment.logEnv("Client environment:", LOG);
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(ZooKeeperAdmin.class);
 
     /**
      * Create a ZooKeeperAdmin object which is used to perform dynamic reconfiguration
