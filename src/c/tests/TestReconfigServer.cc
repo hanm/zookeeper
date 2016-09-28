@@ -75,8 +75,8 @@ void TestReconfigServer::
 setUp() {
     ZooKeeperQuorumServer::tConfigPairs configs;
     configs.push_back(std::make_pair("reconfigEnabled", "true"));
-    configs.push_back(std::make_pair("skipACL", "yes")); 
-    cluster_ = ZooKeeperQuorumServer::getCluster(NUM_SERVERS, configs, "");
+    cluster_ = ZooKeeperQuorumServer::getCluster(NUM_SERVERS, configs,
+        "SERVER_JVMFLAGS=-Dzookeeper.DigestAuthenticationProvider.superDigest=super:D/InIHSb7yEEbrWz8b9l71RjZJU="/* password is test */);
 }
 
 void TestReconfigServer::
@@ -157,7 +157,8 @@ testRemoveFollower() {
     zhandle_t* zk = zookeeper_init(host.c_str(), NULL, 10000, NULL, NULL, 0);
     CPPUNIT_ASSERT_EQUAL(true, waitForConnected(zk, 10));
     CPPUNIT_ASSERT_EQUAL((int)ZOK, zoo_getconfig(zk, 0, buf, &len, &stat));
-
+    CPPUNIT_ASSERT_EQUAL((int)ZOK, zoo_add_auth(zk, "digest", "super:test", 10, NULL,(void*)ZOK));
+    sleep(3);
     // check if all the servers are listed in the config.
     parseConfig(buf, len, servers, version);
     // initially should be 1<<32, which is 0x100000000. This is the zxid
@@ -225,6 +226,8 @@ testNonIncremental() {
     zhandle_t* zk = zookeeper_init(host.c_str(), NULL, 10000, NULL, NULL, 0);
     CPPUNIT_ASSERT_EQUAL(true, waitForConnected(zk, 10));
     CPPUNIT_ASSERT_EQUAL((int)ZOK, zoo_getconfig(zk, 0, buf, &len, &stat));
+    CPPUNIT_ASSERT_EQUAL((int)ZOK, zoo_add_auth(zk, "digest", "super:test", 10, NULL,(void*)ZOK));
+    sleep(3);
 
     // check if all the servers are listed in the config.
     parseConfig(buf, len, servers, version);
@@ -306,6 +309,9 @@ testRemoveConnectedFollower() {
     zoo_deterministic_conn_order(true);
     zhandle_t* zk = zookeeper_init(hosts.c_str(), NULL, 10000, NULL, NULL, 0);
     CPPUNIT_ASSERT_EQUAL(true, waitForConnected(zk, 10));
+    CPPUNIT_ASSERT_EQUAL((int)ZOK, zoo_add_auth(zk, "digest", "super:test", 10, NULL,(void*)ZOK));
+    sleep(3);
+
     std::string connectedHost(zoo_get_current_server(zk));
     std::string portString = connectedHost.substr(connectedHost.find(":") + 1);
     uint32_t port;
