@@ -21,18 +21,21 @@
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
+#include <vector>
+#include <utility>
 #include <unistd.h>
 
 ZooKeeperQuorumServer::
-ZooKeeperQuorumServer(uint32_t id, uint32_t numServers, std::string config) :
+ZooKeeperQuorumServer(uint32_t id, uint32_t numServers, std::string configs, std::string env) :
     id_(id),
+    env_(env),
     numServers_(numServers) {
     const char* root = getenv("ZKROOT");
     if (root == NULL) {
         assert(!"Environment variable 'ZKROOT' is not set");
     }
     root_ = root;
-    createConfigFile(config);
+    createConfigFile(configs);
     createDataDirectory();
     start();
 }
@@ -58,6 +61,9 @@ void ZooKeeperQuorumServer::
 start() {
     std::string command = root_ + "/bin/zkServer.sh start " +
                           getConfigFileName();
+    if (!env_.empty()) {
+        command = env_ + " " + command;
+    }
     assert(system(command.c_str()) == 0);
 }
 
@@ -169,10 +175,15 @@ getDataDirectory() {
 }
 
 std::vector<ZooKeeperQuorumServer*> ZooKeeperQuorumServer::
-getCluster(uint32_t numServers, std::string config) {
+getCluster(uint32_t numServers, ZooKeeperQuorumServer::tConfigPairs configs, std::string env) {
     std::vector<ZooKeeperQuorumServer*> cluster;
+    std::string config;
+    for (ZooKeeperQuorumServer::tConfigPairs::const_iterator iter = configs.begin(); iter != configs.end(); ++iter) {
+        std::pair<std::string, std::string> pair = *iter;
+        config += (pair.first + "=" + pair.second + "\n");
+    }
     for (int i = 0; i < numServers; i++) {
-        cluster.push_back(new ZooKeeperQuorumServer(i, numServers, config));
+        cluster.push_back(new ZooKeeperQuorumServer(i, numServers, config, env));
     }
 
     // Wait until all the servers start, and fail if they don't start within 10

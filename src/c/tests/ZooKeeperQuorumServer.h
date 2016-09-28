@@ -20,12 +20,16 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <utility>
 
 class ZooKeeperQuorumServer {
   public:
     ~ZooKeeperQuorumServer();
+    typedef std::vector<std::pair<std::string, std::string> > tConfigPairs;
+    static std::vector<ZooKeeperQuorumServer*> getCluster(uint32_t numServers);
     static std::vector<ZooKeeperQuorumServer*> getCluster(uint32_t numServers,
-                                                          std::string config = "" /* Optional configs */);
+        tConfigPairs configs, /* Additional config options as a list of key/value pairs. */
+        std::string env       /* Additional environment variables when starting zkServer.sh. */);
     std::string getHostPort();
     uint32_t getClientPort();
     void start();
@@ -36,7 +40,8 @@ class ZooKeeperQuorumServer {
 
   private:
     ZooKeeperQuorumServer();
-    ZooKeeperQuorumServer(uint32_t id, uint32_t numServers, std::string config = "");
+    ZooKeeperQuorumServer(uint32_t id, uint32_t numServers, std::string config = "",
+                          std::string env = "");
     ZooKeeperQuorumServer(const ZooKeeperQuorumServer& that);
     const ZooKeeperQuorumServer& operator=(const ZooKeeperQuorumServer& that);
     void createConfigFile(std::string config = "");
@@ -53,6 +58,7 @@ class ZooKeeperQuorumServer {
     uint32_t numServers_;
     uint32_t id_;
     std::string root_;
+    std::string env_;
 };
 
 #endif  // ZOOKEEPER_QUORUM_SERVER_H
