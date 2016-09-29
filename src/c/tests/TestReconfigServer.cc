@@ -31,6 +31,7 @@ class TestReconfigServer : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST(testNonIncremental);
     CPPUNIT_TEST(testRemoveConnectedFollower);
     CPPUNIT_TEST(testRemoveFollower);
+    CPPUNIT_TEST(testReconfigFailureWithoutAuth);
 #endif
     CPPUNIT_TEST_SUITE_END();
 
