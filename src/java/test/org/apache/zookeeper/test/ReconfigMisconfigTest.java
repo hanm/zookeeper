@@ -74,6 +74,9 @@ public class ReconfigMisconfigTest extends ZKTestCase {
 
     @Test(timeout = 10000)
     public void testReconfigFailWithoutSuperuserPasswordConfiguredOnServer() throws InterruptedException {
+        // This tests the case where ZK ensemble does not have the super user's password configured.
+        // Reconfig should fail as the super user has to be explicitly configured via
+        // zookeeper.DigestAuthenticationProvider.superDigest.
         QuorumPeerConfig.setReconfigEnabled(true);
         try {
             reconfigPort();
@@ -84,14 +87,6 @@ public class ReconfigMisconfigTest extends ZKTestCase {
 
         try {
             zkAdmin.addAuthInfo("digest", "super:".getBytes());
-            reconfigPort();
-            Assert.fail(errorMsg);
-        } catch (KeeperException e) {
-            Assert.assertTrue(e.getCode() == KeeperException.Code.NoAuth);
-        }
-
-        try {
-            zkAdmin.addAuthInfo("digest", "super:test".getBytes());
             reconfigPort();
             Assert.fail(errorMsg);
         } catch (KeeperException e) {
