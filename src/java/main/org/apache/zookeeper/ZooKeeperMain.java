@@ -278,7 +278,7 @@ public class ZooKeeperMain {
             zk.close();
         }
 
-        if (zkAdmin != null && zk.getState().isAlive()) {
+        if (zkAdmin != null && zkAdmin.getState().isAlive()) {
             zkAdmin.close();
         }
 

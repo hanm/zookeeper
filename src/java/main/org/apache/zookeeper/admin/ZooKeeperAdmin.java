@@ -124,7 +124,8 @@ public class ZooKeeperAdmin extends ZooKeeper {
      * @param newMembers
      *                a comma separated list of new membership (non-incremental reconfiguration)
      * @param fromConfig
-     *                version of the current configuration (optional - causes reconfiguration to throw an exception if configuration is no longer current)
+     *                version of the current configuration
+     *                (optional - causes reconfiguration to throw an exception if configuration is no longer current)
      * @param stat the stat of /zookeeper/config znode will be copied to this
      *             parameter if not null.
      * @return new configuration
@@ -166,7 +167,7 @@ public class ZooKeeperAdmin extends ZooKeeper {
      * The Asynchronous version of reconfig.
      *
      * @see #reconfig
-     *      
+     *
      **/
     public void reconfig(String joiningServers, String leavingServers,
         String newMembers, long fromConfig, DataCallback cb, Object ctx) {
