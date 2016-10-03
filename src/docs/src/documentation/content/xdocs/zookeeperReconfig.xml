@@ -318,25 +318,27 @@ server.3=125.23.63.25:2782:2785:participant</programlisting>
       <title>Security</title>
       <para>Prior to <emphasis role="bold">3.5.3</emphasis>, there is no enforced security mechanism
         over reconfig so any ZooKeeper clients that can connect to ZooKeeper server ensemble
-        will have the capability to change the state of a ZooKeeper cluster via reconfig.
+        will have the ability to change the state of a ZooKeeper cluster via reconfig.
         It is thus possible for a malicious client to add compromised server to an ensemble,
-        or to bring down the quorum by removing servers. Cases like these could be security vulnerabilities
-        on a case by case basis.</para>
+        e.g., add a compromised server, or remove legitimate servers.
+        Cases like these could be security vulnerabilities on a case by case basis.
+      </para>
       <para>To address this security concern, we introduced access control over reconfig
         starting from <emphasis role="bold">3.5.3</emphasis> such that only a specific set of users
         can use reconfig commands or APIs, and these users need be configured explicitly. In addition,
         the setup of ZooKeeper cluster must enable authentication so ZooKeeper clients can be authenticated.
       </para>
       <para>
-        We also provides an escape hatch for users who operate and interact with ZooKeeper cluster in a secured
+        We also provides an escape hatch for users who operate and interact with a ZooKeeper ensemble in a secured
         environment (i.e. behind company firewall). For those users who want to use reconfiguration feature but
         don't want the overhead of configuring an explicit list of authorized user for reconfig access checks,
         they can set <ulink url="zookeeperAdmin.html#sc_authOptions">"skipACL"</ulink> to "yes" which will
         skip ACL check and allow any user to reconfigure cluster.
       </para>
       <para>
-        Overall, ZooKeeper provides flexible configuration options that allow user to configure different level of security for
-        reconfigure feature. We leave to the discretion of the user to decide appropriate security measure are in place.
+        Overall, ZooKeeper provides flexible configuration options for the reconfigure feature
+        that allow a user to choose based on user's security requirement.
+        We leave to the discretion of the user to decide appropriate security measure are in place.
       </para>
       <variablelist>
         <varlistentry>
@@ -350,7 +352,7 @@ server.3=125.23.63.25:2782:2785:participant</programlisting>
             </para>
 
             <para>Clients that need to use reconfig commands or reconfig API should be configured as users
-              that have write access to CONFIG_NODE. By default, only super user has full control including
+              that have write access to CONFIG_NODE. By default, only the super user has full control including
               write access to CONFIG_NODE. Additional users can be granted write access through superuser
               by setting an ACL that has write permission associated with specified user.
             </para>

@@ -943,11 +943,10 @@ server.3=zoo3:2888:3888</programlisting>
                 <ulink url="zookeeperReconfig.html">
                   Dynamic Reconfiguration</ulink> feature. When the feature
                 is enabled, users can perform reconfigure operations through
-                ZooKeeper client API or through ZooKeeper command line tools
-                if users are authenticated and authorized to perform such operations.
-                When the feature is disabled, any user including super user can not perform
-                any reconfigure related operations, and any attempts to use reconfig
-                API or reconfig command will return error.
+                the ZooKeeper client API or through ZooKeeper command line tools
+                assuming users are authorized to perform such operations.
+                When the feature is disabled, no user, including the super user,
+                can perform a reconfiguration. Any attempt to reconfigure will return an error.
                 <emphasis role="bold">"reconfigEnabled"</emphasis> option can be set as
                 <emphasis role="bold">"reconfigEnabled=false"</emphasis> or
                 <emphasis role="bold">"reconfigEnabled=true"</emphasis>
