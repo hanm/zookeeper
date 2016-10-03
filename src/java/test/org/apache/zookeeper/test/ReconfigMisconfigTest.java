@@ -20,17 +20,13 @@ package org.apache.zookeeper.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.zookeeper.ZKTestCase;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.PortAssignment;
 import org.apache.zookeeper.admin.ZooKeeperAdmin;
-import org.apache.zookeeper.data.ACL;
-import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig;
 import org.junit.After;
@@ -40,35 +36,30 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReconfigExceptionTest extends ZKTestCase {
-    private static final Logger LOG = LoggerFactory
-            .getLogger(ReconfigExceptionTest.class);
-    private static String authProvider = "zookeeper.DigestAuthenticationProvider.superDigest";
-    private static String superDigest = "super:D/InIHSb7yEEbrWz8b9l71RjZJU="; /* password is 'test'*/
+public class ReconfigMisconfigTest extends ZKTestCase {
+    private static final Logger LOG = LoggerFactory.getLogger(ReconfigMisconfigTest.class);
     private QuorumUtil qu;
     private ZooKeeperAdmin zkAdmin;
+    private static String errorMsg = "Reconfig should fail without configuring the super " +
+            "user's password on server side first.";
 
     @Before
     public void setup() throws InterruptedException {
-        System.setProperty(authProvider, superDigest);
         QuorumPeerConfig.setReconfigEnabled(false);
-
         // Get a three server quorum.
         qu = new QuorumUtil(1);
         qu.disableJMXTest = true;
-
         try {
             qu.startAll();
         } catch (IOException e) {
             Assert.fail("Fail to start quorum servers.");
         }
 
-        resetZKAdmin();
+        instantiateZKAdmin();
     }
 
     @After
     public void tearDown() throws Exception {
-        System.clearProperty(authProvider);
         try {
             if (qu != null) {
                 qu.tearDown();
@@ -82,108 +73,37 @@ public class ReconfigExceptionTest extends ZKTestCase {
     }
 
     @Test(timeout = 10000)
-    public void testReconfigDisabledByDefault() throws InterruptedException {
-        try {
-            reconfigPort();
-            Assert.fail("Reconfig should be disabled by default.");
-        } catch (KeeperException e) {
-            Assert.assertTrue(e.code() == KeeperException.Code.RECONFIGDISABLED);
-        }
-    }
-
-    @Test(timeout = 10000)
-    public void testReconfigFailWithoutAuth() throws InterruptedException {
-        // Now enable reconfig feature by turning on the switch.
+    public void testReconfigFailWithoutSuperuserPasswordConfiguredOnServer() throws InterruptedException {
         QuorumPeerConfig.setReconfigEnabled(true);
-
         try {
             reconfigPort();
-            Assert.fail("Reconfig should fail without auth.");
+            Assert.fail(errorMsg);
         } catch (KeeperException e) {
-            // However a failure is still expected as user is not authenticated, so ACL check will fail.
             Assert.assertTrue(e.getCode() == KeeperException.Code.NoAuth);
         }
-    }
 
-    @Test(timeout = 10000)
-    public void testReconfigEnabledWithSuperUser() throws InterruptedException {
-        QuorumPeerConfig.setReconfigEnabled(true);
+        try {
+            zkAdmin.addAuthInfo("digest", "super:".getBytes());
+            reconfigPort();
+            Assert.fail(errorMsg);
+        } catch (KeeperException e) {
+            Assert.assertTrue(e.getCode() == KeeperException.Code.NoAuth);
+        }
 
         try {
             zkAdmin.addAuthInfo("digest", "super:test".getBytes());
-            Assert.assertTrue(reconfigPort());
-        } catch (KeeperException e) {
-            Assert.fail("Reconfig should not fail, but failed with exception : " + e.getMessage());
-        }
-    }
-
-    @Test(timeout = 10000)
-    public void testReconfigFailWithAuthWithNoACL() throws InterruptedException {
-        resetZKAdmin();
-        QuorumPeerConfig.setReconfigEnabled(true);
-
-        try {
-            zkAdmin.addAuthInfo("digest", "user:test".getBytes());
             reconfigPort();
-            Assert.fail("Reconfig should fail without a valid ACL associated with user.");
-        } catch (KeeperException e) {
-            // Again failure is expected because no ACL is associated with this user.
-            Assert.assertTrue(e.getCode() == KeeperException.Code.NoAuth);
-        }
-    }
-
-    @Test(timeout = 10000)
-    public void testReconfigEnabledWithAuthAndWrongACL() throws InterruptedException {
-        resetZKAdmin();
-        QuorumPeerConfig.setReconfigEnabled(true);
-
-        try {
-            zkAdmin.addAuthInfo("digest", "super:test".getBytes());
-            // There is ACL however the permission is wrong - need WRITE permission at leaste.
-            ArrayList<ACL> acls = new ArrayList<ACL>(
-                    Collections.singletonList(
-                            new ACL(ZooDefs.Perms.READ,
-                                    new Id("digest", "user:tl+z3z0vO6PfPfEENfLF96E6pM0="/* password is test */))));
-            zkAdmin.setACL(ZooDefs.CONFIG_NODE, acls, -1);
-            resetZKAdmin();
-            zkAdmin.addAuthInfo("digest", "user:test".getBytes());
-            reconfigPort();
-            Assert.fail("Reconfig should fail with an ACL that is read only!");
+            Assert.fail(errorMsg);
         } catch (KeeperException e) {
             Assert.assertTrue(e.getCode() == KeeperException.Code.NoAuth);
         }
     }
 
-    @Test(timeout = 10000)
-    public void testReconfigEnabledWithAuthAndACL() throws InterruptedException {
-        resetZKAdmin();
-        QuorumPeerConfig.setReconfigEnabled(true);
-
-        try {
-            zkAdmin.addAuthInfo("digest", "super:test".getBytes());
-            ArrayList<ACL> acls = new ArrayList<ACL>(
-                    Collections.singletonList(
-                            new ACL(ZooDefs.Perms.WRITE,
-                            new Id("digest", "user:tl+z3z0vO6PfPfEENfLF96E6pM0="/* password is test */))));
-            zkAdmin.setACL(ZooDefs.CONFIG_NODE, acls, -1);
-            resetZKAdmin();
-            zkAdmin.addAuthInfo("digest", "user:test".getBytes());
-            Assert.assertTrue(reconfigPort());
-        } catch (KeeperException e) {
-            Assert.fail("Reconfig should not fail, but failed with exception : " + e.getMessage());
-        }
-    }
-
-    // Utility method that recreates a new ZooKeeperAdmin handle, and wait for the handle to connect to
-    // quorum servers.
-    private void resetZKAdmin() throws InterruptedException {
+    private void instantiateZKAdmin() throws InterruptedException {
         String cnxString;
         ClientBase.CountdownWatcher watcher = new ClientBase.CountdownWatcher();
         try {
             cnxString = "127.0.0.1:" + qu.getPeer(1).peer.getClientPort();
-            if (zkAdmin != null) {
-                zkAdmin.close();
-            }
             zkAdmin = new ZooKeeperAdmin(cnxString,
                     ClientBase.CONNECTION_TIMEOUT, watcher);
         } catch (IOException e) {
@@ -212,3 +132,4 @@ public class ReconfigExceptionTest extends ZKTestCase {
         return true;
     }
 }
+
