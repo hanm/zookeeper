@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 ZooKeeperQuorumServer::
-ZooKeeperQuorumServer(uint32_t id, uint32_t numServers, std::string configs, std::string env) :
+ZooKeeperQuorumServer(uint32_t id, uint32_t numServers, std::string config, std::string env) :
     id_(id),
     env_(env),
     numServers_(numServers) {
@@ -35,7 +35,7 @@ ZooKeeperQuorumServer(uint32_t id, uint32_t numServers, std::string configs, std
         assert(!"Environment variable 'ZKROOT' is not set");
     }
     root_ = root;
-    createConfigFile(configs);
+    createConfigFile(config);
     createDataDirectory();
     start();
 }
