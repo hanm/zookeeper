@@ -32,6 +32,7 @@ class TestReconfigServer : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST(testRemoveConnectedFollower);
     CPPUNIT_TEST(testRemoveFollower);
     CPPUNIT_TEST(testReconfigFailureWithoutAuth);
+    CPPUNIT_TEST(testReconfigFailureWithoutServerSuperuserPasswordConfigured);
 #endif
     CPPUNIT_TEST_SUITE_END();
 
@@ -44,7 +45,7 @@ class TestReconfigServer : public CPPUNIT_NS::TestFixture {
     void testRemoveConnectedFollower();
     void testRemoveFollower();
     void testReconfigFailureWithoutAuth();
-
+    void testReconfigFailureWithoutServerSuperuserPasswordConfigured();
   private:
     static const uint32_t NUM_SERVERS;
     FILE* logfile_;
@@ -391,4 +392,53 @@ testReconfigFailureWithoutAuth() {
     }
     zookeeper_close(zk);
 }
+
+void TestReconfigServer::
+testReconfigFailureWithoutServerSuperuserPasswordConfigured() {
+    std::vector<std::string> servers;
+    std::string version;
+    struct Stat stat;
+    int len = 1024;
+    char buf[len];
+
+    // Create a new quorum with the super user's password not configured.
+    tearDown();
+    ZooKeeperQuorumServer::tConfigPairs configs;
+    configs.push_back(std::make_pair("reconfigEnabled", "true"));
+    cluster_ = ZooKeeperQuorumServer::getCluster(NUM_SERVERS, configs, "");
+
+    // connect to a follower.
+    int32_t leader = getLeader();
+    std::vector<int32_t> followers = getFollowers();
+    CPPUNIT_ASSERT(leader >= 0);
+    CPPUNIT_ASSERT_EQUAL(NUM_SERVERS - 1, (uint32_t)(followers.size()));
+    std::stringstream ss;
+    for (int i = 0; i < followers.size(); i++) {
+      ss << cluster_[followers[i]]->getHostPort() << ",";
+    }
+    ss << cluster_[leader]->getHostPort();
+    std::string hosts = ss.str().c_str();
+    zoo_deterministic_conn_order(true);
+    zhandle_t* zk = zookeeper_init(hosts.c_str(), NULL, 10000, NULL, NULL, 0);
+    CPPUNIT_ASSERT_EQUAL(true, waitForConnected(zk, 10));
+
+    std::string connectedHost(zoo_get_current_server(zk));
+    std::string portString = connectedHost.substr(connectedHost.find(":") + 1);
+    uint32_t port;
+    std::istringstream (portString) >> port;
+    CPPUNIT_ASSERT_EQUAL(cluster_[followers[0]]->getClientPort(), port);
+
+    // remove the follower.
+    len = 1024;
+    ss.str("");
+    ss << followers[0];
+    // All cases should fail as server ensemble was not configured with the super user's password.
+    CPPUNIT_ASSERT_EQUAL((int)ZNOAUTH, zoo_reconfig(zk, NULL, ss.str().c_str(), NULL, -1, buf, &len, &stat));
+    CPPUNIT_ASSERT_EQUAL((int)ZOK, zoo_add_auth(zk, "digest", "super:", 11, NULL,(void*)ZOK));
+    CPPUNIT_ASSERT_EQUAL((int)ZNOAUTH, zoo_reconfig(zk, NULL, ss.str().c_str(), NULL, -1, buf, &len, &stat));
+    CPPUNIT_ASSERT_EQUAL((int)ZOK, zoo_add_auth(zk, "digest", "super:test", 10, NULL,(void*)ZOK));
+    CPPUNIT_ASSERT_EQUAL((int)ZNOAUTH, zoo_reconfig(zk, NULL, ss.str().c_str(), NULL, -1, buf, &len, &stat));
+    zookeeper_close(zk);
+}
+
 CPPUNIT_TEST_SUITE_REGISTRATION(TestReconfigServer);
