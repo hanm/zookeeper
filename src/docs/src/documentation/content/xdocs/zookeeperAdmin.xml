@@ -1133,7 +1133,7 @@ server.3=zoo3:2888:3888</programlisting>
 
                 If present, the value should be consistent across every server in
                 the entire ensemble. Setting the value as true on some servers and false
-                on other servers will cause inconsistent behavior depends on which server
+                on other servers will cause inconsistent behavior depending on which server
                 is elected as leader. If the leader has a setting of
                 <emphasis role="bold">"reconfigEnabled=true"</emphasis>, then the ensemble
                 will have reconfig feature enabled. If the leader has a setting of

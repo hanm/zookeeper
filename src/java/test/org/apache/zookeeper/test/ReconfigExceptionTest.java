@@ -55,7 +55,7 @@ public class ReconfigExceptionTest extends ZKTestCase {
     private ZooKeeperAdmin zkAdmin;
 
     @Before
-    public void setup() throws InterruptedException, KeeperException.NoNodeException {
+    public void setup() throws InterruptedException {
         System.setProperty(authProvider, superDigest);
         QuorumPeerConfig.setReconfigEnabled(false);
 

@@ -250,9 +250,7 @@ public class DataTree {
         if (zookeeperZnode != null) { // should always be the case
             zookeeperZnode.addChild(configChildZookeeper);
         } else {
-            String msg = "There's no /zookeeper znode - this should never happen.";
-            LOG.error(msg);
-            throw new RuntimeException(msg);
+            assert false : "There's no /zookeeper znode - this should never happen.";
         }
 
         nodes.put(configZookeeper, configDataNode);
@@ -260,10 +258,8 @@ public class DataTree {
             // Reconfig node is access controlled by default (ZOOKEEPER-2014).
             setACL(configZookeeper, ZooDefs.Ids.READ_ACL_UNSAFE, -1);
         } catch (KeeperException.NoNodeException e) {
-            LOG.error("Fail to set ACL on {} - this should never happen: {}", configZookeeper, e);
-            // Throw an exception to abort the startup of ZooKeeper server, otherwise we will
-            // end up with a ZK server that's reconfigurable to anyone without access control.
-            throw new RuntimeException(e.getMessage());
+            assert false : "There's no " + configZookeeper +
+                    " znode - this should never happen.";
         }
     }
 
