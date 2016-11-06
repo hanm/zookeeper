@@ -284,6 +284,29 @@ testNonIncremental() {
     zookeeper_close(zk);
 }
 
+zhandle_t* TestReconfigServer::
+connectFollower(std::vector<int32_t> &followers) {
+    std::stringstream ss;
+    int32_t leader = getLeader();
+    CPPUNIT_ASSERT(leader >= 0);
+    CPPUNIT_ASSERT_EQUAL(NUM_SERVERS - 1, (uint32_t)(followers.size()));
+    for (int i = 0; i < followers.size(); i++) {
+        ss << cluster_[followers[i]]->getHostPort() << ",";
+    }
+    ss << cluster_[leader]->getHostPort();
+    std::string hosts = ss.str().c_str();
+    zoo_deterministic_conn_order(true);
+    zhandle_t* zk = zookeeper_init(hosts.c_str(), NULL, 10000, NULL, NULL, 0);
+    CPPUNIT_ASSERT_EQUAL(true, waitForConnected(zk, 10));
+
+    std::string connectedHost(zoo_get_current_server(zk));
+    std::string portString = connectedHost.substr(connectedHost.find(":") + 1);
+    uint32_t port;
+    std::istringstream (portString) >> port;
+    CPPUNIT_ASSERT_EQUAL(cluster_[followers[0]]->getClientPort(), port);
+    return zk;
+}
+
 /**
  * 1. Connect to a follower.
  * 2. Remove the follower the client is connected to.
@@ -297,26 +320,10 @@ testRemoveConnectedFollower() {
     char buf[len];
 
     // connect to a follower.
-    int32_t leader = getLeader();
-    std::vector<int32_t> followers = getFollowers();
-    CPPUNIT_ASSERT(leader >= 0);
-    CPPUNIT_ASSERT_EQUAL(NUM_SERVERS - 1, (uint32_t)(followers.size()));
     std::stringstream ss;
-    for (int i = 0; i < followers.size(); i++) {
-      ss << cluster_[followers[i]]->getHostPort() << ",";
-    }
-    ss << cluster_[leader]->getHostPort();
-    std::string hosts = ss.str().c_str();
-    zoo_deterministic_conn_order(true);
-    zhandle_t* zk = zookeeper_init(hosts.c_str(), NULL, 10000, NULL, NULL, 0);
-    CPPUNIT_ASSERT_EQUAL(true, waitForConnected(zk, 10));
+    std::vector<int32_t> followers = getFollowers();
+    zhandle_t* zk = connectFollowers(followers);
     CPPUNIT_ASSERT_EQUAL((int)ZOK, zoo_add_auth(zk, "digest", "super:test", 10, NULL,(void*)ZOK));
-
-    std::string connectedHost(zoo_get_current_server(zk));
-    std::string portString = connectedHost.substr(connectedHost.find(":") + 1);
-    uint32_t port;
-    std::istringstream (portString) >> port;
-    CPPUNIT_ASSERT_EQUAL(cluster_[followers[0]]->getClientPort(), port);
 
     // remove the follower.
     len = 1024;
@@ -348,25 +355,9 @@ testReconfigFailureWithoutAuth() {
     char buf[len];
 
     // connect to a follower.
-    int32_t leader = getLeader();
-    std::vector<int32_t> followers = getFollowers();
-    CPPUNIT_ASSERT(leader >= 0);
-    CPPUNIT_ASSERT_EQUAL(NUM_SERVERS - 1, (uint32_t)(followers.size()));
     std::stringstream ss;
-    for (int i = 0; i < followers.size(); i++) {
-      ss << cluster_[followers[i]]->getHostPort() << ",";
-    }
-    ss << cluster_[leader]->getHostPort();
-    std::string hosts = ss.str().c_str();
-    zoo_deterministic_conn_order(true);
-    zhandle_t* zk = zookeeper_init(hosts.c_str(), NULL, 10000, NULL, NULL, 0);
-    CPPUNIT_ASSERT_EQUAL(true, waitForConnected(zk, 10));
-
-    std::string connectedHost(zoo_get_current_server(zk));
-    std::string portString = connectedHost.substr(connectedHost.find(":") + 1);
-    uint32_t port;
-    std::istringstream (portString) >> port;
-    CPPUNIT_ASSERT_EQUAL(cluster_[followers[0]]->getClientPort(), port);
+    std::vector<int32_t> followers = getFollowers();
+    zhandle_t* zk = connectFollowers(followers);
 
     // remove the follower.
     len = 1024;
@@ -408,25 +399,9 @@ testReconfigFailureWithoutServerSuperuserPasswordConfigured() {
     cluster_ = ZooKeeperQuorumServer::getCluster(NUM_SERVERS, configs, "");
 
     // connect to a follower.
-    int32_t leader = getLeader();
-    std::vector<int32_t> followers = getFollowers();
-    CPPUNIT_ASSERT(leader >= 0);
-    CPPUNIT_ASSERT_EQUAL(NUM_SERVERS - 1, (uint32_t)(followers.size()));
     std::stringstream ss;
-    for (int i = 0; i < followers.size(); i++) {
-      ss << cluster_[followers[i]]->getHostPort() << ",";
-    }
-    ss << cluster_[leader]->getHostPort();
-    std::string hosts = ss.str().c_str();
-    zoo_deterministic_conn_order(true);
-    zhandle_t* zk = zookeeper_init(hosts.c_str(), NULL, 10000, NULL, NULL, 0);
-    CPPUNIT_ASSERT_EQUAL(true, waitForConnected(zk, 10));
-
-    std::string connectedHost(zoo_get_current_server(zk));
-    std::string portString = connectedHost.substr(connectedHost.find(":") + 1);
-    uint32_t port;
-    std::istringstream (portString) >> port;
-    CPPUNIT_ASSERT_EQUAL(cluster_[followers[0]]->getClientPort(), port);
+    std::vector<int32_t> followers = getFollowers();
+    zhandle_t* zk = connectFollowers(followers);
 
     // remove the follower.
     len = 1024;

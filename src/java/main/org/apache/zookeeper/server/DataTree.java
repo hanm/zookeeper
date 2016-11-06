@@ -247,10 +247,12 @@ public class DataTree {
 
     public void addConfigNode() {
         DataNode zookeeperZnode = nodes.get(procZookeeper);
-        if (zookeeperZnode!=null) { // should always be the case
+        if (zookeeperZnode != null) { // should always be the case
             zookeeperZnode.addChild(configChildZookeeper);
         } else {
-            LOG.error("There's no /zookeeper znode - this should never happen.");
+            String msg = "There's no /zookeeper znode - this should never happen.";
+            LOG.error(msg);
+            throw new RuntimeException(msg);
         }
 
         nodes.put(configZookeeper, configDataNode);
