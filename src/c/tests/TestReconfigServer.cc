@@ -55,7 +55,7 @@ class TestReconfigServer : public CPPUNIT_NS::TestFixture {
     void parseConfig(char* buf, int len, std::vector<std::string>& servers,
                      std::string& version);
     bool waitForConnected(zhandle_t* zh, uint32_t timeout_sec);
-    zhandle_t* connectFollower(std::vector<int32_t> &followers);
+    zhandle_t* connectFollowers(std::vector<int32_t> &followers);
 };
 
 const uint32_t TestReconfigServer::NUM_SERVERS = 3;
