@@ -286,7 +286,7 @@ testNonIncremental() {
 }
 
 zhandle_t* TestReconfigServer::
-connectFollower(std::vector<int32_t> &followers) {
+connectFollowers(std::vector<int32_t> &followers) {
     std::stringstream ss;
     int32_t leader = getLeader();
     CPPUNIT_ASSERT(leader >= 0);
