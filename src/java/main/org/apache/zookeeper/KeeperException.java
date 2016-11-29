@@ -141,6 +141,8 @@ public abstract class KeeperException extends Exception {
                 return new NoWatcherException();
             case RECONFIGDISABLED:
                 return new ReconfigDisabledException();
+            case SESSIONCLOSEDREQUIRESASLAUTH:
+                return new SessionClosedRequireAuthException();
             case OK:
             default:
                 throw new IllegalArgumentException("Invalid exception code");
@@ -388,7 +390,11 @@ public abstract class KeeperException extends Exception {
         /** Attempts to remove a non-existing watcher */
         NOWATCHER (-121),
         /** Attempts to perform a reconfiguration operation when reconfiguration feature is disabled. */
-        RECONFIGDISABLED(-123);
+        RECONFIGDISABLED(-123),
+        /** The session has been closed by server because server requires client to do SASL authentication,
+         *  but client is not configured with SASL authentication or configuted with SASL but failed
+         *  (i.e. wrong credential used.). */
+        SESSIONCLOSEDREQUIRESASLAUTH(-124);
 
         private static final Map<Integer,Code> lookup
             = new HashMap<Integer,Code>();
@@ -475,6 +481,8 @@ public abstract class KeeperException extends Exception {
                 return "No such watcher";
             case RECONFIGDISABLED:
                 return "Reconfig is disabled";
+            case SESSIONCLOSEDREQUIRESASLAUTH:
+                return "Session closed because client failed to authenticate";
             default:
                 return "Unknown error " + code;
         }
@@ -809,6 +817,16 @@ public abstract class KeeperException extends Exception {
         public ReconfigDisabledException() { super(Code.RECONFIGDISABLED); }
         public ReconfigDisabledException(String path) {
             super(Code.RECONFIGDISABLED, path);
+        }
+    }
+
+    /**
+     * @see Code#SESSIONCLOSEDREQUIRESASLAUTH
+     */
+    public static class SessionClosedRequireAuthException extends KeeperException {
+        public SessionClosedRequireAuthException() { super(Code.SESSIONCLOSEDREQUIRESASLAUTH); }
+        public SessionClosedRequireAuthException(String path) {
+            super(Code.SESSIONCLOSEDREQUIRESASLAUTH, path);
         }
     }
 }

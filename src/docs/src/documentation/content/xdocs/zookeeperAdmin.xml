@@ -932,6 +932,37 @@ server.3=zoo3:2888:3888</programlisting>
             </listitem>
           </varlistentry>
 
+          <varlistentry>
+            <term>zookeeper.sessionRequireClientSASLAuth</term>
+
+            <listitem>
+              <para>(Java system property only: <emphasis
+                      role="bold">zookeeper.sessionRequireClientSASLAuth</emphasis>)</para>
+
+              <para><emphasis role="bold">New in 3.6.0:</emphasis>
+                When set to <emphasis role="bold">true</emphasis>, ZooKeeper server will only accept
+                connections and requests from clients that have authenticated with server via SASL.
+                Clients that are not configured with SASL authentication, or configured with SASL
+                but fail authentication (i.e. with invalid credential) will not be able to establish a session
+                with server. A typed error code (-124) will be delivered in such case, both Java and C client will
+                close the session with server thereafter, without further attempts on retrying to reconnect.
+
+                By default, this feature is disabled. Users who would like to opt-in can enable the feature
+                by setting <emphasis role="bold">zookeeper.sessionRequireClientSASLAuth</emphasis> to
+                <emphasis role="bold">true</emphasis>.
+              </para>
+
+              <note>
+                <para>This feature overrules the
+                  <emphasis role="bold">zookeeper.allowSaslFailedClients</emphasis> option, so even if server is
+                  configured to allow clients that fail SASL authentication to login, client will not be able to
+                  establish a session with server if this feature is enabled.
+                </para>
+              </note>
+              
+            </listitem>
+          </varlistentry>
+
         </variablelist>
       </section>
 

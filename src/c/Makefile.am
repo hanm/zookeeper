@@ -81,26 +81,27 @@ EXTRA_DIST+=$(wildcard ${srcdir}/tests/*.cc) $(wildcard ${srcdir}/tests/*.h) \
 # tested in TestZookeeperInit and TestZookeeperClose and as such should be tested
 # first as a foundation with more complex test suites to follow.
 TEST_SOURCES = \
-	tests/TestDriver.cc \
-	tests/LibCMocks.cc \
-	tests/LibCSymTable.cc \
-	tests/MocksBase.cc \
-	tests/ZKMocks.cc \
-	tests/Util.cc \
-	tests/ThreadingUtil.cc \
-	tests/TestZookeeperInit.cc \
-	tests/TestZookeeperClose.cc \
-	tests/TestReconfig.cc \
-	tests/TestReconfigServer.cc \
-    tests/TestClientRetry.cc \
-	tests/TestOperations.cc \
-	tests/TestMulti.cc \
-	tests/TestWatchers.cc \
-	tests/TestClient.cc \
-	tests/ZooKeeperQuorumServer.cc \
-	tests/ZooKeeperQuorumServer.h \
-	tests/TestReadOnlyClient.cc \
-	$(NULL)
+  tests/TestDriver.cc \
+  tests/LibCMocks.cc \
+  tests/LibCSymTable.cc \
+  tests/MocksBase.cc \
+  tests/ZKMocks.cc \
+  tests/Util.cc \
+  tests/ThreadingUtil.cc \
+  tests/TestZookeeperInit.cc \
+  tests/TestZookeeperClose.cc \
+  tests/TestReconfig.cc \
+  tests/TestReconfigServer.cc \
+  tests/TestClientRetry.cc \
+  tests/TestOperations.cc \
+  tests/TestMulti.cc \
+  tests/TestWatchers.cc \
+  tests/TestClient.cc \
+  tests/ZooKeeperQuorumServer.cc \
+  tests/ZooKeeperQuorumServer.h \
+  tests/TestReadOnlyClient.cc \
+  tests/TestServerRequireClientSASLAuth.cc \
+  $(NULL)
 
 if SOLARIS
   SHELL_SYMBOL_WRAPPERS = cat ${srcdir}/tests/wrappers.opt

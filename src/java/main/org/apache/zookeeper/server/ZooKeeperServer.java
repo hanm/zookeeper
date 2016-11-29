@@ -61,7 +61,6 @@ import org.apache.zookeeper.server.RequestProcessor.RequestProcessorException;
 import org.apache.zookeeper.server.ServerCnxn.CloseRequestException;
 import org.apache.zookeeper.server.SessionTracker.Session;
 import org.apache.zookeeper.server.SessionTracker.SessionExpirer;
-import org.apache.zookeeper.server.auth.AuthenticationProvider;
 import org.apache.zookeeper.server.auth.ProviderRegistry;
 import org.apache.zookeeper.server.auth.ServerAuthenticationProvider;
 import org.apache.zookeeper.server.persistence.FileTxnSnapLog;
@@ -1075,24 +1074,57 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             return;
         } else {
             if (h.getType() == OpCode.sasl) {
-                Record rsp = processSasl(incomingBuffer,cnxn);
-                ReplyHeader rh = new ReplyHeader(h.getXid(), 0, KeeperException.Code.OK.intValue());
-                cnxn.sendResponse(rh,rsp, "response"); // not sure about 3rd arg..what is it?
-            }
-            else {
-                Request si = new Request(cnxn, cnxn.getSessionId(), h.getXid(),
-                  h.getType(), incomingBuffer, cnxn.getAuthInfo());
-                si.setOwner(ServerCnxn.me);
-                // Always treat packet from the client as a possible
-                // local request.
-                setLocalSessionFlag(si);
-                submitRequest(si);
+                processSasl(incomingBuffer,cnxn, h);
+            } else {
+                if (shouldRequireClientSaslAuth() && !hasCnxSASLAuthenticated(cnxn)) {
+                    ReplyHeader replyHeader = new ReplyHeader(h.getXid(), 0,
+                            Code.SESSIONCLOSEDREQUIRESASLAUTH.intValue());
+                    cnxn.sendResponse(replyHeader, null, "response");
+                    cnxn.sendCloseSession();
+                    cnxn.disableRecv();
+                } else {
+                    Request si = new Request(cnxn, cnxn.getSessionId(), h.getXid(),
+                            h.getType(), incomingBuffer, cnxn.getAuthInfo());
+                    si.setOwner(ServerCnxn.me);
+                    // Always treat packet from the client as a possible
+                    // local request.
+                    setLocalSessionFlag(si);
+                    submitRequest(si);
+                }
             }
         }
         cnxn.incrOutstandingRequests(h);
     }
 
-    private Record processSasl(ByteBuffer incomingBuffer, ServerCnxn cnxn) throws IOException {
+    private boolean shouldAllowSaslFailedClientsConnect() {
+        String allowSaslFailedClients = System.getProperty("zookeeper.allowSaslFailedClients");
+        if (allowSaslFailedClients == null) {
+            return false;
+        } else {
+            return allowSaslFailedClients.equals("true");
+        }
+    }
+
+    private boolean shouldRequireClientSaslAuth() {
+        String sessionRequireClientSASLAuth = System.getProperty("zookeeper.sessionRequireClientSASLAuth");
+        if (sessionRequireClientSASLAuth == null) {
+            return false;
+        } else {
+            return sessionRequireClientSASLAuth.equals("true");
+        }
+    }
+
+    private boolean hasCnxSASLAuthenticated(ServerCnxn cnxn) {
+        for (Id id : cnxn.getAuthInfo()) {
+            if (id.getScheme().equals("sasl")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void processSasl(ByteBuffer incomingBuffer, ServerCnxn cnxn, RequestHeader requestHeader)
+            throws IOException {
         LOG.debug("Responding to client SASL token.");
         GetSASLRequest clientTokenRecord = new GetSASLRequest();
         ByteBufferInputStream.byteBuffer2Record(incomingBuffer,clientTokenRecord);
@@ -1101,6 +1133,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         byte[] responseToken = null;
         try {
             ZooKeeperSaslServer saslServer  = cnxn.zooKeeperSaslServer;
+
             try {
                 // note that clientToken might be empty (clientToken.length == 0):
                 // if using the DIGEST-MD5 mechanism, clientToken will be empty at the beginning of the
@@ -1111,27 +1144,39 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
                     LOG.info("adding SASL authorization for authorizationID: " + authorizationID);
                     cnxn.addAuthInfo(new Id("sasl",authorizationID));
                 }
-            }
-            catch (SaslException e) {
+            } catch (SaslException e) {
                 LOG.warn("Client failed to SASL authenticate: " + e, e);
-                if ((System.getProperty("zookeeper.allowSaslFailedClients") != null)
-                  &&
-                  (System.getProperty("zookeeper.allowSaslFailedClients").equals("true"))) {
+                if (shouldAllowSaslFailedClientsConnect() && !shouldRequireClientSaslAuth()) {
                     LOG.warn("Maintaining client connection despite SASL authentication failure.");
                 } else {
-                    LOG.warn("Closing client connection due to SASL authentication failure.");
-                    cnxn.close();
+                    int error;
+                    if (shouldRequireClientSaslAuth()) {
+                        LOG.warn("Closing client connection due to server requires client SASL authenticaiton," +
+                                "but client SASL authentication has failed, or client is not configured with SASL " +
+                                "authentication.");
+                        error = Code.SESSIONCLOSEDREQUIRESASLAUTH.intValue();
+                    } else {
+                        LOG.warn("Closing client connection due to SASL authentication failure.");
+                        error = Code.AUTHFAILED.intValue();
+                    }
+
+                    ReplyHeader replyHeader = new ReplyHeader(requestHeader.getXid(), 0, error);
+                    cnxn.sendResponse(replyHeader, new SetSASLResponse(null), "response");
+                    cnxn.sendCloseSession();
+                    cnxn.disableRecv();
+                    return;
                 }
             }
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             LOG.error("cnxn.saslServer is null: cnxn object did not initialize its saslServer properly.");
         }
         if (responseToken != null) {
             LOG.debug("Size of server SASL response: " + responseToken.length);
         }
-        // wrap SASL response token to client inside a Response object.
-        return new SetSASLResponse(responseToken);
+
+        ReplyHeader replyHeader = new ReplyHeader(requestHeader.getXid(), 0, Code.OK.intValue());
+        Record record = new SetSASLResponse(responseToken);
+        cnxn.sendResponse(replyHeader, record, "response");
     }
 
     // entry point for quorum/Learner.java
