@@ -20,6 +20,8 @@ package org.apache.zookeeper.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -112,6 +114,14 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory {
         directBufferBytes = Integer.getInteger(
             ZOOKEEPER_NIO_DIRECT_BUFFER_BYTES, 64 * 1024);
     }
+
+    /**
+     * serverCnxnClassCtr is introduced to improve testability of NIOServerCnxn
+     * as creation of NIOServerCnxn instance is buried deep in the factory code.
+     * It will come into play only if ServerCnxnFactory.ZOOKEEPER_SERVER_CNXN property is set
+     * otherwise default behavior will be preserved
+     */
+    private Constructor<? extends NIOServerCnxn> serverCnxnClassCtr = null;
 
     /**
      * AbstractSelectThread is an abstract base class containing a few bits
@@ -630,6 +640,16 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory {
      * limits of the operating system). startup(zks) must be called subsequently.
      */
     public NIOServerCnxnFactory() {
+        String serverCnxnClassName = System.getProperty(ServerCnxnFactory.ZOOKEEPER_SERVER_CNXN, "org.apache.zookeeper.server.NIOServerCnxn");
+        try {
+            Class<? extends NIOServerCnxn> serverCnxnClass = Class.forName(serverCnxnClassName).asSubclass(NIOServerCnxn.class);
+            serverCnxnClassCtr =
+              serverCnxnClass.getConstructor(ZooKeeperServer.class, SocketChannel.class,
+                SelectionKey.class, NIOServerCnxnFactory.class,
+                SelectorThread.class);
+        } catch (Throwable t) {
+            throw new RuntimeException("Exception when trying to get constructor for " + serverCnxnClassName, t);
+        }
     }
 
     private volatile boolean stopped = true;
@@ -842,7 +862,12 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory {
 
     protected NIOServerCnxn createConnection(SocketChannel sock,
             SelectionKey sk, SelectorThread selectorThread) throws IOException {
-        return new NIOServerCnxn(zkServer, sock, sk, this, selectorThread);
+
+        try {
+            return serverCnxnClassCtr.newInstance(zkServer, sock, sk, this, selectorThread);
+        } catch (Throwable t) {
+            throw new IOException("Can not instantiate class for " + serverCnxnClassCtr.getName(), t);
+        }
     }
 
     private int getClientCnxnCount(InetAddress cl) {
