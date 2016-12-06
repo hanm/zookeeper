@@ -948,15 +948,14 @@ server.3=zoo3:2888:3888</programlisting>
             <listitem>
               <para>(No Java system property)</para>
 
-              <para>Election implementation to use. A value of "0" corresponds
-              to the original UDP-based version, "1" corresponds to the
+              <para>Election implementation to use. A value of "1" corresponds to the
               non-authenticated UDP-based version of fast leader election, "2"
               corresponds to the authenticated UDP-based version of fast
               leader election, and "3" corresponds to TCP-based version of
-              fast leader election. Currently, algorithm 3 is the default</para>
+              fast leader election. Currently, algorithm 3 is the default.</para>
               
               <note>
-              <para> The implementations of leader election 0, 1, and 2 are now 
+              <para> The implementations of leader election 1, and 2 are now
               <emphasis role="bold"> deprecated </emphasis>. We have the intention
               of removing them in the next release, at which point only the 
               FastLeaderElection will be available. 
