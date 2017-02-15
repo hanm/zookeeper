@@ -1172,9 +1172,8 @@ server.3=zoo3:2888:3888</programlisting>
 
               <para>Here's an example of the configuration that enables stat, ruok, conf, and isro
               command while disabling the rest of Four Letter Words command:</para>
-              4lw.commands.whitelist=stat, ruok, conf, isro
               <programlisting>
-
+                4lw.commands.whitelist=stat, ruok, conf, isro
               </programlisting>
 
             </listitem>
@@ -1677,9 +1676,9 @@ server.3=zoo3:2888:3888</programlisting>
 
         <para><emphasis role="bold">New in 3.5.3:</emphasis>
           Four Letter Words need to be explicitly white listed before using.
-          Please refer <emphasis role="bold">4lw.commands.whitelist</emphasis>>
+          Please refer <emphasis role="bold">4lw.commands.whitelist</emphasis>
            described in <ulink url="#sc_clusterOptions">
-            configuration section</ulink> for details.
+            cluster configuration section</ulink> for details.
           Moving forward, Four Letter Words will be deprecated, please use
           <ulink url="#sc_adminserver">AdminServer</ulink> instead.
         </para>
@@ -2163,10 +2162,9 @@ server.3=zoo3:2888:3888</programlisting>
         <varlistentry>
           <term>Publicly accessible deployment</term>
           <listitem>
-            <para>ZooKeeper was not designed to be opened to the outside world. A ZooKeeper
-              ensemble is expected to operate in a trusted computing environment, and clients
-              interact with ZooKeeper are not malicious. It is thus recommended to deploy
-              ZooKeeper behind a firewall where accesses to the ensemble is restricted by the firewall rules.
+            <para>
+              A ZooKeeper ensemble is expected to operate in a trusted computing environment.
+              It is thus recommended to deploy ZooKeeper behind a firewall.
             </para>
           </listitem>
         </varlistentry>
