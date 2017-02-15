@@ -268,7 +268,7 @@ public class NettyServerCnxn extends ServerCnxn {
         // We take advantage of the limited size of the length to look
         // for cmds. They are all 4-bytes which fits inside of an int
         String cmd = FourLetterCommands.getCmdMapView().get(len);
-        if (cmd == null) {
+        if (cmd == null || !FourLetterCommands.getWhiteListedCmdView().contains(cmd)) {
             return false;
         }
         channel.setInterestOps(0).awaitUninterruptibly();

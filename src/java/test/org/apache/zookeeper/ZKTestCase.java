@@ -51,6 +51,8 @@ public class ZKTestCase {
             // accidentally attempting to start multiple admin servers on the
             // same port.
             System.setProperty("zookeeper.admin.enableServer", "false");
+            // By default, enable stat 4lw which all tests use to query server states.
+            System.setProperty("zookeeper.4lw.commands.whitelist", "stat");
             testName = method.getName();
             LOG.info("STARTING " + testName);
         }

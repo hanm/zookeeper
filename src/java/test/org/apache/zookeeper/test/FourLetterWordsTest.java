@@ -46,6 +46,16 @@ public class FourLetterWordsTest extends ClientBase {
     @Rule
     public Timeout timeout = new Timeout(30000);
 
+    @Override
+    protected void setUpWhiteListed4LW() {
+        // ZOOKEEPER-2693 disables all 4lw by default. Enable the commands
+        // relevant to these tests here.
+        System.setProperty("zookeeper.4lw.commands.whitelist",
+                "ruok, envi, conf, stat, srvr, cons, dump," +
+                        "wchs, wchp, wchc, srst, crst, " +
+                        "dirs, mntr, gtmk, isro, stmk");
+    }
+
     /** Test the various four letter words */
     @Test
     public void testFourLetterWords() throws Exception {

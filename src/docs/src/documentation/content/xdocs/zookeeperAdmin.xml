@@ -1155,6 +1155,31 @@ server.3=zoo3:2888:3888</programlisting>
             </listitem>
           </varlistentry>
 
+          <varlistentry>
+            <term>4lw.commands.whitelist</term>
+
+            <listitem>
+              <para>(Java system property: <emphasis
+                      role="bold">zookeeper.4lw.commands.whitelist</emphasis>)</para>
+
+              <para><emphasis role="bold">New in 3.5.3:</emphasis>
+                A list of comma separated <ulink url="#sc_4lw">Four Letter Words</ulink>
+                commands that user wants to use. A valid Four Letter Words
+                command must be put in this list else ZooKeeper server will
+                not enable the command.
+                The default value is empty, which disables all Four Letter Words command.
+              </para>
+
+              <para>Here's an example of the configuration that enables stat, ruok, conf, and isro
+              command while disabling the rest of Four Letter Words command:</para>
+              4lw.commands.whitelist=stat, ruok, conf, isro
+              <programlisting>
+
+              </programlisting>
+
+            </listitem>
+          </varlistentry>
+
         </variablelist>
         <para></para>
       </section>
@@ -1639,7 +1664,7 @@ server.3=zoo3:2888:3888</programlisting>
     <section id="sc_zkCommands">
       <title>ZooKeeper Commands</title>
 
-      <section>
+      <section id="sc_4lw">
         <title>The Four Letter Words</title>
         <para>ZooKeeper responds to a small set of commands. Each command is
         composed of four letters. You issue the commands to ZooKeeper via telnet
@@ -1650,7 +1675,16 @@ server.3=zoo3:2888:3888</programlisting>
         while "srvr" and "cons" give extended details on server and
         connections respectively.</para>
 
-        <variablelist>
+        <para><emphasis role="bold">New in 3.5.3:</emphasis>
+          Four Letter Words need to be explicitly white listed before using.
+          Please refer <emphasis role="bold">4lw.commands.whitelist</emphasis>>
+           described in <ulink url="#sc_clusterOptions">
+            configuration section</ulink> for details.
+          Moving forward, Four Letter Words will be deprecated, please use
+          <ulink url="#sc_adminserver">AdminServer</ulink> instead.
+        </para>
+
+      <variablelist>
           <varlistentry>
             <term>conf</term>
 
@@ -2123,6 +2157,17 @@ server.3=zoo3:2888:3888</programlisting>
             recommend practice for estimating the heap size your system needs
             is to run load tests, and then make sure you are well below the
             usage limit that would cause the system to swap.</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>Publicly accessible deployment</term>
+          <listitem>
+            <para>ZooKeeper was not designed to be opened to the outside world. A ZooKeeper
+              ensemble is expected to operate in a trusted computing environment, and clients
+              interact with ZooKeeper are not malicious. It is thus recommended to deploy
+              ZooKeeper behind a firewall where accesses to the ensemble is restricted by the firewall rules.
+            </para>
           </listitem>
         </varlistentry>
       </variablelist>

@@ -21,7 +21,9 @@ package org.apache.zookeeper.server.command;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class contains constants for all the four letter commands
@@ -153,11 +155,31 @@ public class FourLetterCommands {
      */
     public final static int telnetCloseCmd = 0xfff4fffd;
 
-    final static HashMap<Integer, String> cmd2String =
-        new HashMap<Integer, String>();
+    private static final String ZOOKEEPER_4LW_COMMANDS_WHITELIST = "zookeeper.4lw.commands.whitelist";
+
+    final static Map<Integer, String> cmd2String = new HashMap<Integer, String>();
+
+    final static Set<String> whiteListedCommands = new HashSet<String>();
 
     public static Map<Integer, String> getCmdMapView() {
         return Collections.unmodifiableMap(cmd2String);
+    }
+
+    // ZOOKEEPER-2693: Only allow white listed commands.
+    public static Set<String> getWhiteListedCmdView() {
+        if (!whiteListedCommands.isEmpty()) {
+            return Collections.unmodifiableSet(whiteListedCommands);
+        }
+
+        String commands = System.getProperty(ZOOKEEPER_4LW_COMMANDS_WHITELIST);
+        if (commands != null) {
+            String[] list = commands.split(",");
+            for (String cmd : list) {
+                whiteListedCommands.add(cmd.trim());
+            }
+        }
+
+        return Collections.unmodifiableSet(whiteListedCommands);
     }
 
     // specify all of the commands that are available

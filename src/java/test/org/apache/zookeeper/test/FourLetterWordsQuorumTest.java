@@ -34,6 +34,16 @@ public class FourLetterWordsQuorumTest extends QuorumBase {
     protected static final Logger LOG =
         LoggerFactory.getLogger(FourLetterWordsQuorumTest.class);
 
+    @Override
+    public void setUp() throws Exception {
+        // ZOOKEEPER-2693 disables all 4lw by default. Enable the commands
+        // relevant to these tests here.
+        System.setProperty("zookeeper.4lw.commands.whitelist",
+                "ruok, envi, conf, stat, srvr, cons, dump," +
+                "wchs, wchp, wchc, srst, crst, dirs, mntr");
+        super.setUp();
+    }
+
     /** Test the various four letter words */
     @Test
     public void testFourLetterWords() throws Exception {

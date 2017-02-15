@@ -450,6 +450,9 @@ public abstract class ClientBase extends ZKTestCase {
         allClientsSetup = true;
     }
 
+    protected void setUpWhiteListed4LW() {
+    }
+
     @Before
     public void setUp() throws Exception {
         /* some useful information - log the number of fds used before
@@ -469,6 +472,8 @@ public abstract class ClientBase extends ZKTestCase {
         JMXEnv.setUp();
 
         setUpAll();
+
+        setUpWhiteListed4LW();
 
         tmpDir = createTmpDir(BASETEST, true);
 
