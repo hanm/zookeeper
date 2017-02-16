@@ -44,6 +44,7 @@ public class ServerCnxnTest extends ClientBase {
         System.setProperty(
             NIOServerCnxnFactory.ZOOKEEPER_NIO_SESSIONLESS_CNXN_TIMEOUT,
             Integer.toString(cnxnTimeout));
+        System.setProperty("zookeeper.4lw.commands.whitelist", "ruok, stat");
         super.setUp();
     }
 
@@ -52,6 +53,7 @@ public class ServerCnxnTest extends ClientBase {
         super.tearDown();
         System.clearProperty(
             NIOServerCnxnFactory.ZOOKEEPER_NIO_SESSIONLESS_CNXN_TIMEOUT);
+        System.setProperty("zookeeper.4lw.commands.whitelist", "stat");
     }
 
     @Test
