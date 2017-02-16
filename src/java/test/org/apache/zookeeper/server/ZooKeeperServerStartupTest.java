@@ -167,11 +167,7 @@ public class ZooKeeperServerStartupTest extends ZKTestCase {
      */
     @Test(timeout = 30000)
     public void testFourLetterWords() throws Exception {
-        // ZOOKEEPER-2693 disables all 4lw by default. Enable the commands
-        // relevant to these tests here.
-        System.setProperty("zookeeper.4lw.commands.whitelist",
-                "conf, crst, cons, dirs, dump, mntr, " +
-                        "stat, srst, wchp, wchc, wchs, isro");
+        System.setProperty("zookeeper.test.4lw.enabled", "true");
         startSimpleZKServer(startupDelayLatch);
         verify("conf", ZK_NOT_SERVING);
         verify("crst", ZK_NOT_SERVING);
@@ -185,6 +181,7 @@ public class ZooKeeperServerStartupTest extends ZKTestCase {
         verify("wchc", ZK_NOT_SERVING);
         verify("wchs", ZK_NOT_SERVING);
         verify("isro", "null");
+        System.clearProperty("zookeeper.test.4lw.enabled");
     }
 
     private void verify(String cmd, String expected)

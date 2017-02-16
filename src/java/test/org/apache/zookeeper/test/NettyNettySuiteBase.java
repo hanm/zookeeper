@@ -39,11 +39,13 @@ public class NettyNettySuiteBase {
         System.setProperty(ZKClientConfig.ZOOKEEPER_CLIENT_CNXN_SOCKET,
                 ClientCnxnSocketNetty.class.getName());
         System.setProperty("zookeeper.admin.enableServer", "false");
+        System.setProperty("zookeeper.test.4lw.enabled", "true");
     }
 
     @AfterClass
     public static void tearDown() {
         System.clearProperty(ServerCnxnFactory.ZOOKEEPER_SERVER_CNXN_FACTORY);
         System.clearProperty(ZKClientConfig.ZOOKEEPER_CLIENT_CNXN_SOCKET);
+        System.clearProperty("zookeeper.test.4lw.enabled");
     }
 }

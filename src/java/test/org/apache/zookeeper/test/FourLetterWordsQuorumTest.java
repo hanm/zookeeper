@@ -20,6 +20,7 @@ package org.apache.zookeeper.test;
 
 import java.io.IOException;
 
+import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.zookeeper.TestableZooKeeper;
@@ -36,12 +37,13 @@ public class FourLetterWordsQuorumTest extends QuorumBase {
 
     @Override
     public void setUp() throws Exception {
-        // ZOOKEEPER-2693 disables all 4lw by default. Enable the commands
-        // relevant to these tests here.
-        System.setProperty("zookeeper.4lw.commands.whitelist",
-                "ruok, envi, conf, stat, srvr, cons, dump," +
-                "wchs, wchp, wchc, srst, crst, dirs, mntr");
+        System.setProperty("zookeeper.test.4lw.enabled", "true");
         super.setUp();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        System.clearProperty("zookeeper.test.4lw.enabled");
     }
 
     /** Test the various four letter words */

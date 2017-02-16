@@ -55,12 +55,14 @@ public class ReadOnlyModeTest extends ZKTestCase {
     @Before
     public void setUp() throws Exception {
         System.setProperty("readonlymode.enabled", "true");
+        System.setProperty("zookeeper.test.4lw.enabled", "true");
         qu.startQuorum();
     }
 
     @After
     public void tearDown() throws Exception {
         System.setProperty("readonlymode.enabled", "false");
+        System.clearProperty("zookeeper.test.4lw.enabled");
         qu.tearDown();
     }
 

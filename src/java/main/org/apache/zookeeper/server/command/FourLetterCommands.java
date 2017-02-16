@@ -157,6 +157,9 @@ public class FourLetterCommands {
 
     private static final String ZOOKEEPER_4LW_COMMANDS_WHITELIST = "zookeeper.4lw.commands.whitelist";
 
+    // A property only used in tests to turn on / off entire set of supported four letter word commands.
+    private static final String ZOOKEEPER_4LW_TEST = "zookeeper.test.4lw.enabled";
+
     final static Map<Integer, String> cmd2String = new HashMap<Integer, String>();
 
     final static Set<String> whiteListedCommands = new HashSet<String>();
@@ -171,11 +174,17 @@ public class FourLetterCommands {
             return Collections.unmodifiableSet(whiteListedCommands);
         }
 
-        String commands = System.getProperty(ZOOKEEPER_4LW_COMMANDS_WHITELIST);
-        if (commands != null) {
-            String[] list = commands.split(",");
-            for (String cmd : list) {
-                whiteListedCommands.add(cmd.trim());
+        if (System.getProperty(ZOOKEEPER_4LW_TEST, "false").equals("true")) {
+            for (Map.Entry<Integer, String> entry : cmd2String.entrySet()) {
+                whiteListedCommands.add(entry.getValue());
+            }
+        } else {
+            String commands = System.getProperty(ZOOKEEPER_4LW_COMMANDS_WHITELIST);
+            if (commands != null) {
+                String[] list = commands.split(",");
+                for (String cmd : list) {
+                    whiteListedCommands.add(cmd.trim());
+                }
             }
         }
 

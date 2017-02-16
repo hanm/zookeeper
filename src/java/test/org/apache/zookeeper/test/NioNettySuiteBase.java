@@ -35,10 +35,12 @@ public class NioNettySuiteBase {
         System.setProperty(ServerCnxnFactory.ZOOKEEPER_SERVER_CNXN_FACTORY,
                 NettyServerCnxnFactory.class.getName());
         System.setProperty("zookeeper.admin.enableServer", "false");
+        System.setProperty("zookeeper.test.4lw.enabled", "true");
     }
 
     @AfterClass
     public static void tearDown() {
         System.clearProperty(ServerCnxnFactory.ZOOKEEPER_SERVER_CNXN_FACTORY);
+        System.clearProperty("zookeeper.test.4lw.enabled");
     }
 }
