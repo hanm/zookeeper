@@ -18,12 +18,11 @@
 
 package org.apache.zookeeper.server.command;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class contains constants for all the four letter commands
@@ -160,9 +159,11 @@ public class FourLetterCommands {
     // A property only used in tests to turn on / off entire set of supported four letter word commands.
     private static final String ZOOKEEPER_4LW_TEST = "zookeeper.test.4lw.enabled";
 
-    final static Map<Integer, String> cmd2String = new HashMap<Integer, String>();
+    private static final Logger LOG = LoggerFactory.getLogger(FourLetterCommands.class);
 
-    final static Set<String> whiteListedCommands = new HashSet<String>();
+    private static final Map<Integer, String> cmd2String = new HashMap<Integer, String>();
+
+    private static final Set<String> whiteListedCommands = new HashSet<String>();
 
     public static Map<Integer, String> getCmdMapView() {
         return Collections.unmodifiableMap(cmd2String);
@@ -175,6 +176,8 @@ public class FourLetterCommands {
         }
 
         if (System.getProperty(ZOOKEEPER_4LW_TEST, "false").equals("true")) {
+            LOG.warn("All four letter word commands are enabled. This should only be used" +
+                    "in test mode.");
             for (Map.Entry<Integer, String> entry : cmd2String.entrySet()) {
                 whiteListedCommands.add(entry.getValue());
             }
@@ -183,11 +186,15 @@ public class FourLetterCommands {
             if (commands != null) {
                 String[] list = commands.split(",");
                 for (String cmd : list) {
-                    whiteListedCommands.add(cmd.trim());
+                    if (!cmd.trim().isEmpty()) {
+                        whiteListedCommands.add(cmd.trim());
+                    }
                 }
             }
         }
 
+        LOG.info("The list of known four letter word commands is : {}", Arrays.asList(cmd2String));
+        LOG.info("The list of enabled four letter word commands is : {}", Arrays.asList(whiteListedCommands));
         return Collections.unmodifiableSet(whiteListedCommands);
     }
 
