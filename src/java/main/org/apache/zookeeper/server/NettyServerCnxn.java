@@ -87,18 +87,23 @@ public class NettyServerCnxn extends ServerCnxn {
             LOG.debug("close called for sessionid:0x"
                     + Long.toHexString(sessionId));
         }
+        LOG.info("valkyrie: close called for sessionid:0x"
+            + Long.toHexString(sessionId));
         synchronized(factory.cnxns){
             // if this is not in cnxns then it's already closed
             if (!factory.cnxns.remove(this)) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("cnxns size:" + factory.cnxns.size());
                 }
+                LOG.info("valkyrie: return 1.");
                 return;
             }
             if (LOG.isDebugEnabled()) {
                 LOG.debug("close in progress for sessionid:0x"
                         + Long.toHexString(sessionId));
             }
+            LOG.info("close in progress for sessionid:0x"
+                + Long.toHexString(sessionId));
 
             synchronized (factory.ipMap) {
                 Set<NettyServerCnxn> s =
@@ -112,6 +117,7 @@ public class NettyServerCnxn extends ServerCnxn {
             channel.close();
         }
         factory.unregisterConnection(this);
+        LOG.info("valkyrie: bean unregistered.");
     }
 
     @Override

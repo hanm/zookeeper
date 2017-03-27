@@ -145,7 +145,9 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Closing " + cnxn);
                 }
+                LOG.info("valkyrie: closing connection.");
                 cnxn.close();
+                LOG.info("valkyrie: connection closed.");
             }
         }
 
