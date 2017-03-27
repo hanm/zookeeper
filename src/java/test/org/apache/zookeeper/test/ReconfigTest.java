@@ -319,6 +319,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         }
 
         closeAllHandles(zkArr, zkAdminArr);
+        qu.tearDown();
     }
 
     /**
@@ -425,6 +426,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         testServerHasConfig(zkArr[leavingIndex2], joiningServers, null);
 
         closeAllHandles(zkArr, zkAdminArr);
+        qu.tearDown();
     }
 
     @Test
@@ -464,6 +466,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         testNormalOperation(zkArr[1], zkArr[2]);
 
         closeAllHandles(zkArr, zkAdminArr);
+        qu.tearDown();
     }
 
     @Test
@@ -495,6 +498,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
             testServerHasConfig(zkArr[i], null, leavingServers);
 
         closeAllHandles(zkArr, zkAdminArr);
+        qu.tearDown();
     }
 
     @SuppressWarnings("unchecked")
@@ -582,6 +586,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
             }
         }
         closeAllHandles(zkArr, zkAdminArr);
+        qu.tearDown();
     }
 
     @Test
@@ -708,6 +713,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         testServerHasConfig(zkArr[follower2], joiningServers, null);
 
         closeAllHandles(zkArr, zkAdminArr);
+        qu.tearDown();
     }
 
     @Test
@@ -887,6 +893,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         }
 
         closeAllHandles(zkArr, zkAdminArr);
+        qu.tearDown();
     }
     
     @Test
@@ -902,6 +909,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
             long version = qv.getVersion();
             Assert.assertTrue(version == 0x100000000L);
         }
+        qu.tearDown();
     }
 
     /**
@@ -981,6 +989,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         assertRemotePeerMXBeanAttributes(leavingQS3, remotePeerBean3);
 
         closeAllHandles(zkArr, zkAdminArr);
+        qu.tearDown();
     }
 
     /**
@@ -1056,6 +1065,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         assertRemotePeerMXBeanAttributes(changingQS3, remotePeerBean3);
 
         closeAllHandles(zkArr, zkAdminArr);
+        qu.tearDown();
     }
 
     private void assertLocalPeerMXBeanAttributes(QuorumPeer qp,
