@@ -381,10 +381,14 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         qu.shutdown(leavingIndex1);
         qu.shutdown(leavingIndex2);
 
+        LOG.info("valkyrie: reconfig 0");
+
         // 3 servers still up so this should work
         reconfig(zkAdminArr[stayingIndex2], null, leavingServers, null, -1);
         
         qu.shutdown(stayingIndex2);
+
+        LOG.info("valkyrie: reconfig 1.");
 
         // the following commands would not work in the original
         // cluster of 5, but now that we've removed 2 servers
@@ -393,7 +397,8 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         testServerHasConfig(zkArr[stayingIndex1], null, leavingServers);
         testServerHasConfig(zkArr[stayingIndex3], null, leavingServers);
         testNormalOperation(zkArr[stayingIndex1], zkArr[stayingIndex3]);
-        
+
+        LOG.info("valkyrie: before sleep.");
         // this is a test that a reconfig will only succeed
         // if there is a quorum up in new config. Below there is no
         // quorum so it should fail
@@ -402,16 +407,19 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         // that the switched off servers are down
         Thread.sleep(10000);
 
+        LOG.info("valkyrie: after sleep.");
         try {
             reconfig(zkAdminArr[stayingIndex1], joiningServers, null, null, -1);
             Assert.fail("reconfig completed successfully even though there is no quorum up in new config!");
         } catch (KeeperException.NewConfigNoQuorum e) {
 
         }
-        
+
+        LOG.info("valkyrie: before restart third server.");
         // now start the third server so that new config has quorum
         qu.restart(stayingIndex2);
 
+        LOG.info("valkyrie: after restart third server.");
         reconfig(zkAdminArr[stayingIndex1], joiningServers, null, null, -1);
         testNormalOperation(zkArr[stayingIndex2], zkArr[stayingIndex3]);
         testServerHasConfig(zkArr[stayingIndex2], joiningServers, null);
@@ -421,12 +429,16 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         // about the change and becomes an observer.
 
         qu.restart(leavingIndex2);
+        LOG.info("valkyrie: qu restart leaving index 2.");
         Assert.assertTrue(qu.getPeer(leavingIndex2).peer.getPeerState() == ServerState.OBSERVING);
         testNormalOperation(zkArr[stayingIndex2], zkArr[leavingIndex2]);
         testServerHasConfig(zkArr[leavingIndex2], joiningServers, null);
 
+        LOG.info("valkyrie: closing all handles");
         closeAllHandles(zkArr, zkAdminArr);
+        LOG.info("valkyrie: shutting down all qus.");
         qu.tearDown();
+        LOG.info("valkyrie: all quorum peers shutdown.");
     }
 
     @Test
