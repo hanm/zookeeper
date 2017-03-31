@@ -110,6 +110,7 @@ public class MBeanRegistry {
             synchronized (LOCK) {
                 mBeanServer.registerMBean(bean, oname);
                 mapBean2Path.put(bean, path);
+                LOG.info("valkyrie: registered bean " + bean.getName() + " with path " + path);
             }
         } catch (JMException e) {
             LOG.warn("Failed to register MBean " + bean.getName());
