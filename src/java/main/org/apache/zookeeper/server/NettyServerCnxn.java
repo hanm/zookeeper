@@ -113,8 +113,13 @@ public class NettyServerCnxn extends ServerCnxn {
             }
         }
 
-        if (channel.isOpen()) {
+        try {
+          if (channel.isOpen()) {
             channel.close();
+          }
+        } catch (Exception ex) {
+          LOG.info("valkyrie: shit on session 0x" + Long.toHexString(sessionId) + " " + ex);
+          throw ex;
         }
         factory.unregisterConnection(this);
         LOG.info("valkyrie: bean unregistered for session 0x" + Long.toHexString(sessionId));
