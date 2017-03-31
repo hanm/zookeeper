@@ -95,7 +95,7 @@ public class NettyServerCnxn extends ServerCnxn {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("cnxns size:" + factory.cnxns.size());
                 }
-                LOG.info("valkyrie: return 1.");
+                LOG.info("valkyrie: return 1 for session: 0x" + Long.toHexString(sessionId));
                 return;
             }
             if (LOG.isDebugEnabled()) {
@@ -117,7 +117,7 @@ public class NettyServerCnxn extends ServerCnxn {
             channel.close();
         }
         factory.unregisterConnection(this);
-        LOG.info("valkyrie: bean unregistered.");
+        LOG.info("valkyrie: bean unregistered for session 0x" + Long.toHexString(sessionId));
     }
 
     @Override
