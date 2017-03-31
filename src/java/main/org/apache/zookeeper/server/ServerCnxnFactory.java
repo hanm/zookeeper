@@ -171,6 +171,9 @@ public abstract class ServerCnxnFactory {
         ConnectionBean jmxConnectionBean = connectionBeans.remove(serverCnxn);
         if (jmxConnectionBean != null){
             MBeanRegistry.getInstance().unregister(jmxConnectionBean);
+        } else {
+            LOG.error("valkyrie: no bean to remove with session: 0x" +
+                    Long.toHexString(serverCnxn.getSessionId()));
         }
     }
     

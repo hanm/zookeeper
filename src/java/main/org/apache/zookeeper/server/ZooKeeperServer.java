@@ -697,6 +697,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             if (valid) {
                 if (serverCnxnFactory != null && serverCnxnFactory.cnxns.contains(cnxn)) {
                     serverCnxnFactory.registerConnection(cnxn);
+                    LOG.info("valkyrie: registered bean for cnxn session 0x" + Long.toHexString(cnxn.getSessionId()));
                 } else if (secureServerCnxnFactory != null && secureServerCnxnFactory.cnxns.contains(cnxn)) {
                     secureServerCnxnFactory.registerConnection(cnxn);
                 }
