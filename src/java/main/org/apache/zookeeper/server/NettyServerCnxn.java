@@ -87,6 +87,9 @@ public class NettyServerCnxn extends ServerCnxn {
             LOG.debug("close called for sessionid:0x"
                     + Long.toHexString(sessionId));
         }
+
+        factory.unregisterConnection(this);
+
         synchronized(factory.cnxns){
             // if this is not in cnxns then it's already closed
             if (!factory.cnxns.remove(this)) {
@@ -111,7 +114,6 @@ public class NettyServerCnxn extends ServerCnxn {
         if (channel.isOpen()) {
             channel.close();
         }
-        factory.unregisterConnection(this);
     }
 
     @Override
