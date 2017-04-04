@@ -679,34 +679,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
         Assert.assertTrue(qu.getPeer(leaderIndex).peer.getQuorumAddress()
                 .getPort() == newQuorumPort);
         Assert.assertTrue(getLeaderId(qu) != leaderIndex); // the leader changed
-
-        joiningServers.clear();
-
-        // change everyone's leader election port
-
-        for (int i = 1; i <= 3; i++) {
-            joiningServers.add("server." + i + "=localhost:"
-                    + qu.getPeer(i).peer.getQuorumAddress().getPort() + ":"
-                    + PortAssignment.unique() + ":participant;localhost:"
-                    + qu.getPeer(i).peer.getClientPort());
-        }
-
-        reconfig(zkAdminArr[1], joiningServers, null, null, -1);
-
-        leaderIndex = getLeaderId(qu);
-        int follower1 = leaderIndex == 1 ? 2 : 1;
-        int follower2 = 1;
-        while (follower2 == leaderIndex || follower2 == follower1)
-            follower2++;
-
-        // lets kill the leader and see if a new one is elected
-
-        qu.shutdown(getLeaderId(qu));
-
-        testNormalOperation(zkArr[follower2], zkArr[follower1]);
-        testServerHasConfig(zkArr[follower1], joiningServers, null);
-        testServerHasConfig(zkArr[follower2], joiningServers, null);
-
+        
         closeAllHandles(zkArr, zkAdminArr);
     }
 
