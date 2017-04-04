@@ -674,7 +674,15 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
 
         reconfig(zkAdminArr[leaderIndex], joiningServers, null, null, -1);
 
+        if (leaderIndex != getLeaderId(qu)) {
+            LOG.error("leader id immediately changed from " + leaderIndex + " to " + getLeaderId(qu) + " after reconfig!!!");
+        } else {
+            LOG.info("leader id remains as " + leaderIndex + " immediately after reconfig.");
+        }
+
         testNormalOperation(zkArr[followerIndex], zkArr[leaderIndex]);
+
+        LOG.info("leader id after testNormalOperation is " + getLeaderId(qu));
 
         Assert.assertTrue(qu.getPeer(leaderIndex).peer.getQuorumAddress()
                 .getPort() == newQuorumPort);
