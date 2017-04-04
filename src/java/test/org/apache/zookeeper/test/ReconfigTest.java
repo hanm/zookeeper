@@ -678,8 +678,13 @@ public class ReconfigTest extends ZKTestCase implements DataCallback{
 
         Assert.assertTrue(qu.getPeer(leaderIndex).peer.getQuorumAddress()
                 .getPort() == newQuorumPort);
+        int leaderId = getLeaderId(qu);
+        if (leaderId == leaderIndex) {
+            LOG.error("Leader id does not change: " + leaderIndex);
+        }
+
         Assert.assertTrue(getLeaderId(qu) != leaderIndex); // the leader changed
-        
+
         closeAllHandles(zkArr, zkAdminArr);
     }
 
