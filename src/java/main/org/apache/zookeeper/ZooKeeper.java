@@ -122,14 +122,22 @@ import java.util.Set;
  * A client needs an object of a class implementing Watcher interface for
  * processing the events delivered to the client.
  *
- * When a client drops current connection and re-connects to a server, all the
+ * When a client drops the current connection and re-connects to a server, all the
  * existing watches are considered as being triggered but the undelivered events
  * are lost. To emulate this, the client will generate a special event to tell
- * the event handler a connection has been dropped. This special event has type
- * EventNone and state sKeeperStateDisconnected.
+ * the event handler a connection has been dropped. This special event has
+ * EventType None and KeeperState Disconnected.
  *
  */
-public class ZooKeeper {
+/*
+ * We suppress the "try" warning here because the close() method's signature
+ * allows it to throw InterruptedException which is strongly advised against
+ * by AutoCloseable (see: http://docs.oracle.com/javase/7/docs/api/java/lang/AutoCloseable.html#close()).
+ * close() will never throw an InterruptedException but the exception remains in the
+ * signature for backwards compatibility purposes.
+*/
+@SuppressWarnings("try")
+public class ZooKeeper implements AutoCloseable {
 
     /**
      * @deprecated Use {@link ZKClientConfig#ZOOKEEPER_CLIENT_CNXN_SOCKET}
@@ -1287,6 +1295,14 @@ public class ZooKeeper {
      * invalid. All the ephemeral nodes in the ZooKeeper server associated with
      * the session will be removed. The watches left on those nodes (and on
      * their parents) will be triggered.
+     * <p>
+     * Added in 3.5.3: <a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html">try-with-resources</a>
+     * may be used instead of calling close directly.
+     * </p>
+     * <p>
+     * This method does not wait for all internal threads to exit.
+     * Use the {@link #close(int) } method to wait for all resources to be released
+     * </p>
      *
      * @throws InterruptedException
      */
@@ -1311,6 +1327,22 @@ public class ZooKeeper {
         }
 
         LOG.info("Session: 0x" + Long.toHexString(getSessionId()) + " closed");
+    }
+
+    /**
+     * Close this client object as the {@link #close() } method.
+     * This method will wait for internal resources to be released.
+     *
+     * @param waitForShutdownTimeoutMs timeout (in milliseconds) to wait for resources to be released.
+     * Use zero or a negative value to skip the wait
+     * @throws InterruptedException
+     * @return true if waitForShutdownTimeout is greater than zero and all of the resources have been released
+     *
+     * @since 3.5.4
+     */
+    public boolean close(int waitForShutdownTimeoutMs) throws InterruptedException {
+        close();
+        return testableWaitForShutdown(waitForShutdownTimeoutMs);
     }
 
     /**

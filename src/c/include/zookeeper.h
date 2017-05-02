@@ -591,8 +591,8 @@ ZOOAPI const char* zoo_get_current_server(zhandle_t* zh);
  * ZBADARGUMENTS - invalid input parameters
  * ZMARSHALLINGERROR - failed to marshall a request; possibly, out of memory
  * ZOPERATIONTIMEOUT - failed to flush the buffers within the specified timeout.
- * ZCONNECTIONLOSS - a network error occured while attempting to send request to server
- * ZSYSTEMERROR -- a system (OS) error occured; it's worth checking errno to get details
+ * ZCONNECTIONLOSS - a network error occurred while attempting to send request to server
+ * ZSYSTEMERROR -- a system (OS) error occurred; it's worth checking errno to get details
  */
 ZOOAPI int zookeeper_close(zhandle_t *zh);
 
@@ -646,12 +646,12 @@ ZOOAPI struct sockaddr* zookeeper_get_connected_host(zhandle_t *zh,
  * ZOK - success
  * ZBADARGUMENTS - invalid input parameters
  * ZINVALIDSTATE - zhandle state is either ZOO_SESSION_EXPIRED_STATE or ZOO_AUTH_FAILED_STATE
- * ZCONNECTIONLOSS - a network error occured while attempting to establish
+ * ZCONNECTIONLOSS - a network error occurred while attempting to establish
  * a connection to the server
  * ZMARSHALLINGERROR - failed to marshall a request; possibly, out of memory
  * ZOPERATIONTIMEOUT - hasn't received anything from the server for 2/3 of the
  * timeout value specified in zookeeper_init()
- * ZSYSTEMERROR -- a system (OS) error occured; it's worth checking errno to get details
+ * ZSYSTEMERROR -- a system (OS) error occurred; it's worth checking errno to get details
  */
 #ifdef WIN32
 ZOOAPI int zookeeper_interest(zhandle_t *zh, SOCKET *fd, int *interest,
@@ -670,11 +670,11 @@ ZOOAPI int zookeeper_interest(zhandle_t *zh, int *fd, int *interest,
  * ZOK - success
  * ZBADARGUMENTS - invalid input parameters
  * ZINVALIDSTATE - zhandle state is either ZOO_SESSION_EXPIRED_STATE or ZOO_AUTH_FAILED_STATE
- * ZCONNECTIONLOSS - a network error occured while attempting to send request to server
+ * ZCONNECTIONLOSS - a network error occurred while attempting to send request to server
  * ZSESSIONEXPIRED - connection attempt failed -- the session's expired
  * ZAUTHFAILED - authentication request failed, e.i. invalid credentials
  * ZRUNTIMEINCONSISTENCY - a server response came out of order
- * ZSYSTEMERROR -- a system (OS) error occured; it's worth checking errno to get details
+ * ZSYSTEMERROR -- a system (OS) error occurred; it's worth checking errno to get details
  * ZNOTHING -- not an error; simply indicates that there no more data from the server
  *              to be processed (when called with ZOOKEEPER_READ flag).
  */
@@ -1436,7 +1436,7 @@ ZOOAPI const char* zerror(int c);
  * ZBADARGUMENTS - invalid input parameters
  * ZINVALIDSTATE - zhandle state is either ZOO_SESSION_EXPIRED_STATE or ZOO_AUTH_FAILED_STATE
  * ZMARSHALLINGERROR - failed to marshall a request; possibly, out of memory
- * ZSYSTEMERROR - a system error occured
+ * ZSYSTEMERROR - a system error occurred
  */
 ZOOAPI int zoo_add_auth(zhandle_t *zh,const char* scheme,const char* cert,
 	int certLen, void_completion_t completion, const void *data);
@@ -1504,6 +1504,41 @@ ZOOAPI void zoo_set_log_callback(zhandle_t *zh, log_callback_fn callback);
  */
 ZOOAPI void zoo_deterministic_conn_order(int yesOrNo);
 
+/**
+ * Type of watchers: used to select which type of watchers should be removed
+ */
+typedef enum {
+  ZWATCHERTYPE_CHILDREN = 1,
+  ZWATCHERTYPE_DATA = 2,
+  ZWATCHERTYPE_ANY = 3
+} ZooWatcherType;
+
+/**
+ * \brief removes the watchers for the given path and watcher type.
+ *
+ * \param zh the zookeeper handle obtained by a call to \ref zookeeper_init
+ * \param path the path for which watchers will be removed
+ * \param wtype the watcher type to be removed
+ * \param watcher the watcher to be removed, if null all watchers for that
+ * path (and watcher type) will be removed
+ * \param watcherCtx the contex associated with the watcher to be removed
+ * \param local whether the watchers will be removed locally even if there is
+ * no server connection
+ * \return the return code for the function call.
+ * ZOK - operation completed successfully
+ * ZNOWATCHER - the watcher couldn't be found.
+ * ZINVALIDSTATE - if !local, zhandle state is either ZOO_SESSION_EXPIRED_STATE
+ * or ZOO_AUTH_FAILED_STATE
+ * ZBADARGUMENTS - invalid input parameters
+ * ZMARSHALLINGERROR - failed to marshall a request; possibly, out of memory
+ * ZSYSTEMERROR - a system error occured
+ */
+ZOOAPI int zoo_aremove_watchers(zhandle_t *zh, const char *path,
+        ZooWatcherType wtype, watcher_fn watcher, void *watcherCtx, int local,
+        void_completion_t *completion, const void *data);
+
+
+#ifdef THREADED
 /**
  * \brief create a node synchronously.
  *
@@ -2002,15 +2037,6 @@ ZOOAPI int zoo_set_acl(zhandle_t *zh, const char *path, int version,
 ZOOAPI int zoo_multi(zhandle_t *zh, int count, const zoo_op_t *ops, zoo_op_result_t *results);
 
 /**
- * Type of watchers: used to select which type of watchers should be removed
- */
-typedef enum {
-  ZWATCHERTYPE_CHILDREN = 1,
-  ZWATCHERTYPE_DATA = 2,
-  ZWATCHERTYPE_ANY = 3
-} ZooWatcherType;
-
-/**
  * \brief removes the watchers for the given path and watcher type.
  *
  * \param zh the zookeeper handle obtained by a call to \ref zookeeper_init
@@ -2032,31 +2058,7 @@ typedef enum {
  */
 ZOOAPI int zoo_remove_watchers(zhandle_t *zh, const char *path,
         ZooWatcherType wtype, watcher_fn watcher, void *watcherCtx, int local);
-
-/**
- * \brief removes the watchers for the given path and watcher type.
- *
- * \param zh the zookeeper handle obtained by a call to \ref zookeeper_init
- * \param path the path for which watchers will be removed
- * \param wtype the watcher type to be removed
- * \param watcher the watcher to be removed, if null all watchers for that
- * path (and watcher type) will be removed
- * \param watcherCtx the contex associated with the watcher to be removed
- * \param local whether the watchers will be removed locally even if there is
- * no server connection
- * \return the return code for the function call.
- * ZOK - operation completed successfully
- * ZNOWATCHER - the watcher couldn't be found.
- * ZINVALIDSTATE - if !local, zhandle state is either ZOO_SESSION_EXPIRED_STATE
- * or ZOO_AUTH_FAILED_STATE
- * ZBADARGUMENTS - invalid input parameters
- * ZMARSHALLINGERROR - failed to marshall a request; possibly, out of memory
- * ZSYSTEMERROR - a system error occured
- */
-ZOOAPI int zoo_aremove_watchers(zhandle_t *zh, const char *path,
-        ZooWatcherType wtype, watcher_fn watcher, void *watcherCtx, int local,
-        void_completion_t *completion, const void *data);
-
+#endif
 #ifdef __cplusplus
 }
 #endif

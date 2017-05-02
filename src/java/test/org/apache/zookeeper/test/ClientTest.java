@@ -47,6 +47,7 @@ import org.apache.zookeeper.proto.ReplyHeader;
 import org.apache.zookeeper.proto.RequestHeader;
 import org.apache.zookeeper.server.PrepRequestProcessor;
 import org.apache.zookeeper.server.util.OSMXBean;
+import static org.apache.zookeeper.test.ClientBase.CONNECTION_TIMEOUT;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -113,8 +114,7 @@ public class ClientTest extends ClientBase {
             LOG.info("{}",zk.testableRemoteSocketAddress());
             LOG.info("{}",zk.toString());
         } finally {
-            zk.close();
-            zk.testableWaitForShutdown(CONNECTION_TIMEOUT);
+            zk.close(CONNECTION_TIMEOUT);
             LOG.info("{}",zk.testableLocalSocketAddress());
             LOG.info("{}",zk.testableRemoteSocketAddress());
             LOG.info("{}",zk.toString());
@@ -759,11 +759,10 @@ public class ClientTest extends ClientBase {
             try {
                 for (; current < count; current++) {
                     TestableZooKeeper zk = createClient();
-                    zk.close();
                     // we've asked to close, wait for it to finish closing
                     // all the sub-threads otw the selector may not be
                     // closed when we check (false positive on test Assert.failure
-                    zk.testableWaitForShutdown(CONNECTION_TIMEOUT);
+                    zk.close(CONNECTION_TIMEOUT);
                 }
             } catch (Throwable t) {
                 LOG.error("test Assert.failed", t);
@@ -843,5 +842,16 @@ public class ClientTest extends ClientBase {
 
         Assert.assertEquals(r.getErr(), Code.UNIMPLEMENTED.intValue());
         zk.testableWaitForShutdown(CONNECTION_TIMEOUT);
+    }
+
+    @Test
+    public void testTryWithResources() throws Exception {
+        ZooKeeper zooKeeper;
+        try (ZooKeeper zk = createClient()) {
+            zooKeeper = zk;
+            Assert.assertTrue(zooKeeper.getState().isAlive());
+        }
+
+        Assert.assertFalse(zooKeeper.getState().isAlive());
     }
 }

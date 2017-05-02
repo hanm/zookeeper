@@ -409,8 +409,10 @@ public class Leader {
      */
     void lead() throws IOException, InterruptedException {
         self.end_fle = Time.currentElapsedTime();
-        LOG.info("LEADING - LEADER ELECTION TOOK - " +
-              (self.end_fle - self.start_fle) + " " + QuorumPeer.FLE_TIME_UNIT);
+        long electionTimeTaken = self.end_fle - self.start_fle;
+        self.setElectionTimeTaken(electionTimeTaken);
+        LOG.info("LEADING - LEADER ELECTION TOOK - {} {}", electionTimeTaken,
+                QuorumPeer.FLE_TIME_UNIT);
         self.start_fle = 0;
         self.end_fle = 0;
 
@@ -588,8 +590,9 @@ public class Leader {
 
                     // check leader running status
                     if (!this.isRunning()) {
-                        shutdown("Unexpected internal error");
-                        return;
+                        // set shutdown flag
+                        shutdownMessage = "Unexpected internal error";
+                        break;
                     }
 
                     if (!tickSkip && !syncedAckSet.hasAllQuorums()) {
@@ -721,7 +724,9 @@ public class Leader {
        // concurrent reconfigs are allowed, this can happen.
        if (outstandingProposals.containsKey(zxid - 1)) return false;
        
-       // getting a quorum from all necessary configurations
+       // in order to be committed, a proposal must be accepted by a quorum.
+       //
+       // getting a quorum from all necessary configurations.
         if (!p.hasAllQuorums()) {
            return false;                 
         }
@@ -733,8 +738,6 @@ public class Leader {
             LOG.warn("First is "
                     + (lastCommitted+1));
         }     
-        
-        // in order to be committed, a proposal must be accepted by a quorum              
         
         outstandingProposals.remove(zxid);
         
@@ -1209,7 +1212,9 @@ public class Leader {
                                                     + leaderStateSummary.getLastZxid()
                                                     + " (last zxid)");
                 }
-                electingFollowers.add(id);
+                if (ss.getLastZxid() != -1) {
+                    electingFollowers.add(id);
+                }
             }
             QuorumVerifier verifier = self.getQuorumVerifier();
             if (electingFollowers.contains(self.getId()) && verifier.containsQuorum(electingFollowers)) {
