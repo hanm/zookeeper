@@ -1515,7 +1515,13 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
 
             if (qv.getVersion() == lastSeenQuorumVerifier.getVersion()) {
                 QuorumPeerConfig.deleteFile(getNextDynamicConfigFilename());
+            } else {
+                LOG.info("kosmos qv version is {}; last seen qv version is {} ",qv.getVersion(), lastSeenQuorumVerifier.getVersion());
+                for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+                    LOG.info("kosmos {}", ste);
+                }
             }
+
             QuorumServer qs = qv.getAllMembers().get(getId());
             if (qs != null) {
                 setQuorumAddress(qs.addr);
