@@ -162,6 +162,9 @@ public class ReconfigDuringLeaderSyncTest extends QuorumPeerTestBase {
         watch.waitForConnected(ClientBase.CONNECTION_TIMEOUT);
         // do one successful operation on the newly added node
         postReconfigClient.create("/reconfigIssue", "".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+        if (nextDynaFile.exists()) {
+            LOG.error("next dynamic file is not deleted {}!!!!", nextDynaFile.getAbsoluteFile().getName());
+        }
         assertFalse("zoo.cfg.dynamic.next is not deleted.", nextDynaFile.exists());
 
         // verify that joiner has up-to-date config, including all four servers.
