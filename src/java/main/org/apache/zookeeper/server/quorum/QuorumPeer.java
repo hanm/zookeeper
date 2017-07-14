@@ -1485,8 +1485,9 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
             if ((quorumVerifier != null) && (quorumVerifier.getVersion() >= qv.getVersion())) {
                 // this is normal. For example - server found out about new config through FastLeaderElection gossiping
                 // and then got the same config in UPTODATE message so its already known
-                LOG.debug(getId() + " setQuorumVerifier called with known or old config " + qv.getVersion() +
+                LOG.info(getId() + " setQuorumVerifier called with known or old config " + qv.getVersion() +
                         ". Current version: " + quorumVerifier.getVersion());
+                LOG.info("kosmos : return...");
                 return quorumVerifier;
             }
             QuorumVerifier prevQV = quorumVerifier;
