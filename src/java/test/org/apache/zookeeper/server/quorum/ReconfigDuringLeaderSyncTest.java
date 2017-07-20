@@ -165,6 +165,14 @@ public class ReconfigDuringLeaderSyncTest extends QuorumPeerTestBase {
         if (nextDynaFile.exists()) {
             LOG.error("next dynamic file is not deleted {}!!!!", nextDynaFile.getAbsoluteFile().getName());
         }
+
+        int timeout = 15000;
+        while (nextDynaFile.exists() && timeout > 0) {
+            Thread.sleep(100);
+            timeout -= 100;
+            LOG.info("zoo.cfg.dynamic.next is not deleted. Sleeping...");
+        }
+
         assertFalse("zoo.cfg.dynamic.next is not deleted.", nextDynaFile.exists());
 
         // verify that joiner has up-to-date config, including all four servers.
