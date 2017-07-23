@@ -42,6 +42,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
 
 import org.apache.zookeeper.KeeperException.BadArgumentsException;
 import org.apache.zookeeper.common.AtomicFileWritingIdiom;
@@ -1451,7 +1452,12 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     }
 
     public String getNextDynamicConfigFilename() {
-        return configFilename + QuorumPeerConfig.nextDynamicConfigFileSuffix;
+        if (configFilename != null) {
+            return configFilename + QuorumPeerConfig.nextDynamicConfigFileSuffix;
+        } else {
+            LOG.warn("configFileName is null, this should only happen in unit tests.");
+            return UUID.randomUUID().toString() + QuorumPeerConfig.nextDynamicConfigFileSuffix;
+        }
     }
     
     public void setLastSeenQuorumVerifier(QuorumVerifier qv, boolean writeToDisk){
