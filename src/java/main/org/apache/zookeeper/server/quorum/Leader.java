@@ -185,6 +185,7 @@ public class Leader {
         synchronized (observingLearners) {
             observingLearners.remove(peer);
         }
+        LOG.info("Remove {} from learner handler.", peer);
     }
 
     boolean isLearnerSynced(LearnerHandler peer){
