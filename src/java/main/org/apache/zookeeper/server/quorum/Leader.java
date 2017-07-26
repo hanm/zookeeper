@@ -168,6 +168,7 @@ public class Leader {
         synchronized (learners) {
             learners.add(learner);
         }
+        LOG.info("kosmos add {} to learner handlers.", learner);
     }
 
     /**
@@ -185,7 +186,7 @@ public class Leader {
         synchronized (observingLearners) {
             observingLearners.remove(peer);
         }
-        LOG.info("Remove {} from learner handler.", peer);
+        LOG.info("Remove {} from learner handler.", peer);k
     }
 
     boolean isLearnerSynced(LearnerHandler peer){
