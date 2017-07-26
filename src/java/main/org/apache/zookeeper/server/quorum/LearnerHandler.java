@@ -184,6 +184,7 @@ public class LearnerHandler extends ZooKeeperThread {
         this.sock = sock;
         this.leader = leader;
         leader.addLearnerHandler(this);
+        LOG.info("New learner handler created.");
     }
 
     @Override
