@@ -449,14 +449,11 @@ public class QuorumCnxManager {
              // exception to be thrown, also UAE cannot be wrapped cleanly
              // so we log the exception in order to capture this critical
              // detail.
-             LOG.warn("Cannot open channel to " + sid
-                     + " at election address " + electionAddr, e);
+
              closeSocket(sock);
              throw e;
          } catch (IOException e) {
-             LOG.warn("Cannot open channel to " + sid
-                     + " at election address " + electionAddr,
-                     e);
+             
              closeSocket(sock);
              return false;
          }

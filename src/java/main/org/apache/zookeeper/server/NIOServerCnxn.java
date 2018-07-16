@@ -482,8 +482,7 @@ public class NIOServerCnxn extends ServerCnxn {
         if (cmd == null) {
             return false;
         }
-        LOG.info("Processing " + cmd + " command from "
-                + sock.socket().getRemoteSocketAddress());
+
         packetReceived();
 
         /** cancel the selection key to remove the socket handling
@@ -611,11 +610,6 @@ public class NIOServerCnxn extends ServerCnxn {
             return;
         }
 
-        LOG.info("Closed socket connection for client "
-                + sock.socket().getRemoteSocketAddress()
-                + (sessionId != 0 ?
-                        " which had sessionid 0x" + Long.toHexString(sessionId) :
-                        " (no session established for client)"));
         closeSock(sock);
     }
 

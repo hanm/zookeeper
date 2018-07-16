@@ -293,8 +293,6 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory {
                                           + " - max is " + maxClientCnxns );
                 }
 
-                LOG.info("Accepted socket connection from "
-                         + sc.socket().getRemoteSocketAddress());
                 sc.configureBlocking(false);
 
                 // Round-robin assign this connection to a selector thread

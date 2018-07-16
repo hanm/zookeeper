@@ -196,6 +196,7 @@ public class FinalRequestProcessor implements RequestProcessor {
                 cnxn.updateStatsForResponse(request.cxid, request.zxid, lastOp,
                         request.createTime, Time.currentElapsedTime());
 
+                LOG.info("kosmos {}", request.cnxn);
                 zks.finishSessionInit(request.cnxn, true);
                 return;
             }

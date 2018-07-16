@@ -46,7 +46,6 @@ public class StatCommand extends AbstractFourLetterCommand {
                 pw.println("READ-ONLY mode; serving only read-only clients");
             }
             if (len == FourLetterCommands.statCmd) {
-                LOG.info("Stat command output");
                 pw.println("Clients:");
                 for(ServerCnxn c : factory.getConnections()){
                     c.dumpConnectionInfo(pw, true);
