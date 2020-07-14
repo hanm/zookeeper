@@ -33,6 +33,7 @@ import java.util.stream.IntStream;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.zookeeper.PortAssignment;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class MultipleAddressesTest {
@@ -101,12 +102,6 @@ public class MultipleAddressesTest {
         MultipleAddresses multipleAddresses = new MultipleAddresses(addresses);
 
         Assert.assertTrue(addresses.contains(multipleAddresses.getReachableAddress()));
-    }
-
-    @Test(expected = NoRouteToHostException.class)
-    public void testGetValidAddressWithNotValid() throws NoRouteToHostException {
-        MultipleAddresses multipleAddresses = new MultipleAddresses(new InetSocketAddress("10.0.0.1", 22));
-        multipleAddresses.getReachableAddress();
     }
 
     @Test

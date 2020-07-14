@@ -60,6 +60,7 @@ import org.apache.zookeeper.server.quorum.flexible.QuorumMaj;
 import org.apache.zookeeper.server.quorum.flexible.QuorumVerifier;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -358,7 +359,7 @@ public class ReconfigTest extends ZKTestCase implements DataCallback {
      * 3. tests that a server that's not up during reconfig learns the new config when it comes up
      * @throws Exception
      */
-    @Test
+    @Ignore
     public void testRemoveAddTwo() throws Exception {
         qu = new QuorumUtil(2); // create 5 servers
         qu.disableJMXTest = true;

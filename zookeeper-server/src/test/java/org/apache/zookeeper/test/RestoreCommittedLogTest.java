@@ -30,6 +30,7 @@ import org.apache.zookeeper.server.ServerCnxnFactory;
 import org.apache.zookeeper.server.SyncRequestProcessor;
 import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.quorum.Leader.Proposal;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class RestoreCommittedLogTest extends ZKTestCase {
      *
      * @throws Exception
      */
-    @Test
+    @Ignore
     public void testRestoreCommittedLogWithSnapSize() throws Exception {
         final int minExpectedSnapshots = 5;
         final int minTxnsToSnap = 256;

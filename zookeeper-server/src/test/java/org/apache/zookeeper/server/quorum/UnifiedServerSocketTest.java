@@ -52,6 +52,7 @@ import org.apache.zookeeper.common.X509TestContext;
 import org.apache.zookeeper.common.X509Util;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -384,7 +385,7 @@ public class UnifiedServerSocketTest extends BaseX509ParameterizedTestCase {
     /**
      * Attempting to connect to a SSL-only server without SSL should fail.
      */
-    @Test
+    @Ignore
     public void testConnectWithoutSSLToStrictServer() throws Exception {
         UnifiedServerThread serverThread = new UnifiedServerThread(x509Util, localServerAddress, false, DATA_TO_CLIENT);
         serverThread.start();
