@@ -121,6 +121,7 @@ createConfigFile(std::string config) {
     confFile << "initLimit=5\n";
     confFile << "syncLimit=2\n";
     confFile << "dataDir=" << getDataDirectory() << "\n";
+    confFile << "localSessionsEnabled=true\n";
     for (uint32_t i = 0; i < numServers_; i++) {
         confFile << getServerString(i) << "\n";
     }
