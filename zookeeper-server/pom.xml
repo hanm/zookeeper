@@ -176,6 +176,11 @@
       <artifactId>snappy-java</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.rocksdb</groupId>
+      <artifactId>rocksdbjni</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
