@@ -283,6 +283,43 @@ public class ReadOnlyModeTest extends ZKTestCase {
         zk.close();
     }
 
+    @Test(timeout = 90000)
+    public void testGlobalSessionInRO() throws Exception {
+        qu.startQuorum();
+
+        CountdownWatcher watcher = new CountdownWatcher();
+        ZooKeeper zk = new ZooKeeper(qu.getConnString(), CONNECTION_TIMEOUT, watcher, true);
+        watcher.waitForConnected(CONNECTION_TIMEOUT);
+        LOG.info("global session created 0x{}", Long.toHexString(zk.getSessionId()));
+
+        watcher.reset();
+        qu.shutdown(2);
+        try {
+            watcher.waitForConnected(CONNECTION_TIMEOUT);
+            fail("Should not be able to renew a global session");
+        } catch (TimeoutException e) {
+        }
+        zk.close();
+
+        watcher.reset();
+        zk = new ZooKeeper(qu.getConnString(), CONNECTION_TIMEOUT, watcher, true);
+        try {
+            watcher.waitForConnected(CONNECTION_TIMEOUT);
+            fail("Should not be able to create a global session");
+        } catch (TimeoutException e) {
+        }
+        zk.close();
+
+        qu.getPeer(1).peer.enableLocalSessions(true);
+        zk = new ZooKeeper(qu.getConnString(), CONNECTION_TIMEOUT, watcher, true);
+        try {
+            watcher.waitForConnected(CONNECTION_TIMEOUT);
+        } catch (TimeoutException e) {
+            fail("Should be able to create a local session");
+        }
+        zk.close();
+    }
+
     /**
      * Ensures that client seeks for r/w servers while it's connected to r/o
      * server.
